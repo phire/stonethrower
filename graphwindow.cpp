@@ -8,7 +8,7 @@ GraphWindow::GraphWindow(QWindow *parent)
     resize(1000, 600);
 }
 
-void GraphWindow::exposeEvent(QExposeEvent *event) {
+void GraphWindow::exposeEvent(QExposeEvent *) {
     if(isExposed()) 
         renderNow();
 }
@@ -37,7 +37,11 @@ void GraphWindow::renderNow() {
 }
 
 void GraphWindow::render(QPainter *painter) {
-    painter->drawText(QRectF(0, 0, width(), height()), Qt::AlignCenter, QStringLiteral("QWindow"));
+
+    for(int i = 0; i < lines.size(); i++) {
+        painter->drawLine(lines.at(i));
+    }
+
 }
 
 void GraphWindow::renderLater()
@@ -58,3 +62,13 @@ bool GraphWindow::event(QEvent *event)
     return QWindow::event(event);
 }
 
+void GraphWindow::mousePressEvent(QMouseEvent *e) {
+    if(e->button() == Qt::LeftButton)
+        lineStart = e->pos();
+}
+
+void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
+    if(e->button() == Qt::LeftButton)
+        lines.append(QLine(lineStart, e->pos()));
+    renderLater();
+}

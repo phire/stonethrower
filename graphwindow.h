@@ -16,7 +16,14 @@ protected:
     void resizeEvent(QResizeEvent *event);
     void exposeEvent(QExposeEvent *event);
 
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+
+
 private:
     QBackingStore *m_backingStore;
     bool m_update_pending;
+
+    QPoint lineStart;
+    QVector<QLine> lines;
 };
