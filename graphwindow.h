@@ -19,11 +19,16 @@ protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
 
+    void mouseMoveEvent(QMouseEvent *e);
+
+
 
 private:
     QBackingStore *m_backingStore;
     bool m_update_pending;
 
     QPoint lineStart;
+    QPoint mouseCurrent;
+    bool showGuide;
     QVector<QLine> lines;
 };

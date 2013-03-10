@@ -1,11 +1,13 @@
 #include "graphwindow.h"
 
 GraphWindow::GraphWindow(QWindow *parent)
-  : QWindow(parent), m_update_pending(false) {
+  : QWindow(parent), m_update_pending(false), showGuide(false) {
     m_backingStore = new QBackingStore(this);
     create();
 
     resize(1000, 600);
+
+
 }
 
 void GraphWindow::exposeEvent(QExposeEvent *) {
@@ -37,11 +39,14 @@ void GraphWindow::renderNow() {
 }
 
 void GraphWindow::render(QPainter *painter) {
-
+    static QPen roadPen(Qt::SolidPattern, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    painter->setPen(roadPen);
     for(int i = 0; i < lines.size(); i++) {
         painter->drawLine(lines.at(i));
     }
 
+    if(showGuide)
+        painter->drawLine(lineStart, mouseCurrent);
 }
 
 void GraphWindow::renderLater()
@@ -63,12 +68,23 @@ bool GraphWindow::event(QEvent *event)
 }
 
 void GraphWindow::mousePressEvent(QMouseEvent *e) {
-    if(e->button() == Qt::LeftButton)
-        lineStart = e->pos();
+    if(e->button() == Qt::LeftButton) {
+        mouseCurrent = lineStart = e->pos();
+        showGuide = true;
+    }
 }
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
-    if(e->button() == Qt::LeftButton)
+    if(e->button() == Qt::LeftButton) {
         lines.append(QLine(lineStart, e->pos()));
-    renderLater();
+        renderLater();
+        showGuide = false;
+    }
+}
+
+void GraphWindow::mouseMoveEvent(QMouseEvent *e) {
+    if(showGuide) {
+        mouseCurrent = e->pos();
+        renderLater();
+    }
 }
