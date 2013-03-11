@@ -2,12 +2,13 @@
 
 GraphWindow::GraphWindow(QWindow *parent)
   : QWindow(parent), m_update_pending(false), showGuide(false) {
+	edgeStart = NULL;
     m_backingStore = new QBackingStore(this);
     create();
 
     resize(1000, 600);
 
-	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(RenderLater()));
+	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(renderLater()));
 
 }
 
@@ -43,11 +44,16 @@ void GraphWindow::render(QPainter *painter) {
     static QPen roadPen(Qt::SolidPattern, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter->setPen(roadPen);
     for(int i = 0; i < graph.edges.size(); i++) {
-        painter->drawLine(graph.edges.at(i).toLine());
+        painter->drawLine(graph.edges.at(i)->toLine());
     }
 
     if(showGuide)
-        painter->drawLine(lineStart, mouseCurrent);
+        painter->drawLine(edgeStart->pos.toPoint(), mouseCurrent);
+
+	const Intersection *snapNode = graph.nodeAt(mouseCurrent);
+	if(snapNode != NULL) {
+		painter->drawEllipse(snapNode->toPoint(), 15, 15);
+	}
 }
 
 void GraphWindow::renderLater()
@@ -70,25 +76,24 @@ bool GraphWindow::event(QEvent *event)
 
 void GraphWindow::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-        mouseCurrent = lineStart = e->pos();
+        edgeStart = graph.nodeAt(e->pos());
+		if(!edgeStart)
+			edgeStart = new Intersection(e->pos());
         showGuide = true;
     }
 }
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-		Intersection n1(lineStart);
-		Intersection n2(e->pos());
-		graph.addNode(n1);
-		graph.addNode(n2);
-		graph.addEdge(n1, n2);
+		Intersection *edgeEnd = graph.nodeAt(e->pos());
+		if(!edgeEnd)
+			edgeEnd = new Intersection(e->pos());
+		graph.addEdge(edgeStart, edgeEnd);
         showGuide = false;
     }
 }
 
 void GraphWindow::mouseMoveEvent(QMouseEvent *e) {
-    if(showGuide) {
-        mouseCurrent = e->pos();
-        renderLater();
-    }
+    mouseCurrent = e->pos();
+	renderLater();
 }
