@@ -1,4 +1,5 @@
 #include <QtGui>
+#include "graph.h"
 
 class GraphWindow : public QWindow {
     Q_OBJECT
@@ -30,5 +31,5 @@ private:
     QPoint lineStart;
     QPoint mouseCurrent;
     bool showGuide;
-    QVector<QLine> lines;
+    Graph graph;
 };

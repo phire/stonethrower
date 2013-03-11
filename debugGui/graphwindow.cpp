@@ -7,6 +7,7 @@ GraphWindow::GraphWindow(QWindow *parent)
 
     resize(1000, 600);
 
+	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(RenderLater()));
 
 }
 
@@ -41,8 +42,8 @@ void GraphWindow::renderNow() {
 void GraphWindow::render(QPainter *painter) {
     static QPen roadPen(Qt::SolidPattern, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter->setPen(roadPen);
-    for(int i = 0; i < lines.size(); i++) {
-        painter->drawLine(lines.at(i));
+    for(int i = 0; i < graph.edges.size(); i++) {
+        painter->drawLine(graph.edges.at(i).toLine());
     }
 
     if(showGuide)
@@ -76,8 +77,11 @@ void GraphWindow::mousePressEvent(QMouseEvent *e) {
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-        lines.append(QLine(lineStart, e->pos()));
-        renderLater();
+		Intersection n1(lineStart);
+		Intersection n2(e->pos());
+		graph.addNode(n1);
+		graph.addNode(n2);
+		graph.addEdge(n1, n2);
         showGuide = false;
     }
 }
