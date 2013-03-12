@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = simulation \
-		  debugGui
+      debugGui \
+    gameGui
 
 debugGui.depends = simulation
