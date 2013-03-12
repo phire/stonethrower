@@ -4,6 +4,5 @@
         <file>vertexShader.vsh</file>
         <file>lightingFragmentShader.fsh</file>
         <file>lightingVertexShader.vsh</file>
-        <file>cubeTexture.png</file>
     </qresource>
 </RCC>
