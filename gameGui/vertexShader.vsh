@@ -1,9 +1,9 @@
-#version 130
+#version 120
 
 uniform mat4 mvpMatrix;
-in vec4 vertex;
-in vec4 color;
-out vec4 varyingColor;
+attribute vec4 vertex;
+attribute vec4 color;
+varying vec4 varyingColor;
 
 void main(void)
 {
