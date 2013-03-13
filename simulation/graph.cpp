@@ -50,7 +50,7 @@ void Graph::splitEdges(Road *newEdge) {
 }
 
 Road* Graph::split(Road *edge1, Road *edge2, const QVector2D at) {
-	Intersection *n = nodeAt(at.toPoint()); 
+	Intersection *n = nodeAt(at); 
 	if(!n)
 		n = new Intersection(at);
 	edge2->end->delEdge(edge2);
@@ -69,23 +69,20 @@ Road* Graph::split(Road *edge1, Road *edge2, const QVector2D at) {
 	return edge4;
 }
 
-Intersection* Graph::nodeAt(QPoint p) {
-	QVector2D v(p);
-
+Intersection* Graph::nodeAt(QVector2D v) {
 	QSetIterator<Intersection *> i(nodes);
 	while(i.hasNext()) {
 		Intersection *node = i.next();
-		if((v - node->pos).length() < 15.0)
+		if((v - node->pos).length() < 0.015)
 			return node;
 	}
 	return NULL;
 }
 
-Road* Graph::roadAt(QPoint) {
+Road* Graph::roadAt(QVector2D) {
 	return NULL;
 }
 
-Intersection::Intersection(QPoint p) 	: pos(p) {}
 Intersection::Intersection(QVector2D p) : pos(p) {}
 
 void Intersection::addEdge(Road *edge) {
@@ -107,8 +104,8 @@ Road::Road(Intersection *n1, Intersection *n2) : start(n1), end(n2) {
 	n2->addEdge(this);
 }
 
-QLine Road::toLine() const {
-	return QLine(start->toPoint(), end->toPoint());
+std::array<QVector2D*, 2> Road::getCoords() const {
+	return {{&start->pos, &end->pos}};
 }
 
 bool Road::intersect(Road *other, QVector2D *at) {

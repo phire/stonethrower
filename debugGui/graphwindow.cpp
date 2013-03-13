@@ -7,9 +7,9 @@ GraphWindow::GraphWindow(QWindow *parent)
     create();
 
     resize(1000, 600);
+	scale = 1000;
 
 	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(renderLater()));
-
 }
 
 void GraphWindow::exposeEvent(QExposeEvent *) {
@@ -44,15 +44,17 @@ void GraphWindow::render(QPainter *painter) {
     static QPen roadPen(Qt::SolidPattern, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter->setPen(roadPen);
     for(int i = 0; i < graph.edges.size(); i++) {
-        painter->drawLine(graph.edges.at(i)->toLine());
+		auto coords = graph.edges.at(i)->getCoords();
+        painter->drawLine(((*coords[0]) * scale).toPoint(), 
+						  ((*coords[1]) * scale).toPoint());
     }
 
     if(showGuide)
-        painter->drawLine(edgeStart->pos.toPoint(), mouseCurrent);
+        painter->drawLine((edgeStart->pos*scale).toPoint(), mouseCurrent);
 
-	const Intersection *snapNode = graph.nodeAt(mouseCurrent);
+	Intersection *snapNode = graph.nodeAt(QVector2D(mouseCurrent)/scale);
 	if(snapNode != NULL) {
-		painter->drawEllipse(snapNode->toPoint(), 15, 15);
+		painter->drawEllipse((snapNode->pos*scale).toPoint(), 15, 15);
 	}
 }
 
@@ -76,18 +78,20 @@ bool GraphWindow::event(QEvent *event)
 
 void GraphWindow::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-        edgeStart = graph.nodeAt(e->pos());
+		auto v = QVector2D(e->pos()) / scale;
+        edgeStart = graph.nodeAt(v);
 		if(!edgeStart)
-			edgeStart = new Intersection(e->pos());
+			edgeStart = new Intersection(v);
         showGuide = true;
     }
 }
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-		Intersection *edgeEnd = graph.nodeAt(e->pos());
+		auto v = QVector2D(e->pos()) / scale;
+		Intersection *edgeEnd = graph.nodeAt(v);
 		if(!edgeEnd)
-			edgeEnd = new Intersection(e->pos());
+			edgeEnd = new Intersection(v);
 		graph.addEdge(edgeStart, edgeEnd);
         showGuide = false;
     }

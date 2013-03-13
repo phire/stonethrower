@@ -29,4 +29,5 @@ private:
     QPoint mouseCurrent;
     bool showGuide;
     Graph graph;
+	float scale;
 };
