@@ -21,22 +21,14 @@ protected:
 
 private:
   QGLShaderProgram lightingShaderProgram;
-  /*QVector<QVector3D> cubeVertices;
-  QVector<QVector3D> cubeNormals;
-  QVector<QVector3D> cubeColours;*/
+  QGLShaderProgram colouringShaderProgram;
+  QGLShaderProgram simpleShaderProgram;
 
   QVector<QVector3D> landVertices;
-  QVector<QVector3D> landColours;
-  QVector<QVector3D> landNormals;
-
-  QGLShaderProgram colouringShaderProgram;
   QVector<QVector3D> spotlightVertices;
   QVector<QVector3D> spotlightColours;
 
-  QGLShaderProgram simpleShaderProgram;
-
-  void drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
-  //void drawCube(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
+  void drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix);
   void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
 
   QMatrix4x4 pMatrix;

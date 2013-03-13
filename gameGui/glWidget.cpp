@@ -36,15 +36,8 @@ void GlWidget::initializeGL() {
 
   cubes << new Model(&lightingShaderProgram) << new Model(&lightingShaderProgram);
 
-  landVertices << QVector3D(-10, -0.5, -10) << QVector3D(-10, -0.5, 10) << QVector3D(10, -0.5, 10)
-               << QVector3D(10, -0.5, 10) <<  QVector3D(10, -0.5, -10) << QVector3D(-10, -0.5, -10);
-
-  landColours << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-              << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0);
-
-  landNormals << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-              << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0);
-
+  landVertices << QVector3D(-1000, -0.5, -1000) << QVector3D(-1000, -0.5, 1000) << QVector3D(1000, -0.5, 1000)
+               << QVector3D(1000, -0.5, 1000) <<  QVector3D(1000, -0.5, -1000) << QVector3D(-1000, -0.5, -1000);
 
   spotlightVertices << QVector3D(   0,    1,    0) << QVector3D(-0.5,    0,  0.5) << QVector3D( 0.5,    0,  0.5) // Front
                     << QVector3D(   0,    1,    0) << QVector3D( 0.5,    0, -0.5) << QVector3D(-0.5,    0, -0.5) // Back
@@ -70,39 +63,23 @@ void GlWidget::resizeGL(int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void GlWidget::drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition) {
+void GlWidget::drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix) {
   QMatrix3x3 normalMatrix;
   normalMatrix = mvMatrix.normalMatrix();
 
-  lightingShaderProgram.bind();
-
-  lightingShaderProgram.setUniformValue("mvpMatrix", pMatrix * mvMatrix);
-  lightingShaderProgram.setUniformValue("mvMatrix", mvMatrix);
-  lightingShaderProgram.setUniformValue("normalMatrix", normalMatrix);
-  lightingShaderProgram.setUniformValue("lightPosition", viewMatrix * lightPosition);
-
-  lightingShaderProgram.setUniformValue("ambientColor", QColor(32, 32, 32));
-  lightingShaderProgram.setUniformValue("diffuseColor", QColor(128, 128, 128));
-  lightingShaderProgram.setUniformValue("specularColor", QColor(255, 255, 255));
-  lightingShaderProgram.setUniformValue("ambientReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("diffuseReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("specularReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("shininess", (GLfloat) 20.0);
-  lightingShaderProgram.setUniformValue("texture", 0);
-
-  lightingShaderProgram.setAttributeArray("vertex", landVertices.constData());
-  lightingShaderProgram.enableAttributeArray("vertex");
-  lightingShaderProgram.setAttributeArray("normal", landNormals.constData());
-  lightingShaderProgram.enableAttributeArray("normal");
-  lightingShaderProgram.setAttributeArray("colour", landColours.constData());
-  lightingShaderProgram.enableAttributeArray("colour");
+  simpleShaderProgram.bind();
+  simpleShaderProgram.setUniformValue("mvpMatrix", pMatrix * viewMatrix);
+  simpleShaderProgram.setAttributeArray("vertex", landVertices.constData());
+  simpleShaderProgram.enableAttributeArray("vertex");
+  simpleShaderProgram.setUniformValue("color", QColor(193, 232, 191));
+  simpleShaderProgram.enableAttributeArray("color");
 
   glDrawArrays(GL_TRIANGLES, 0, landVertices.size());
 
-  lightingShaderProgram.disableAttributeArray("vertex");
-  lightingShaderProgram.disableAttributeArray("normal");
+  simpleShaderProgram.disableAttributeArray("vertex");
+  simpleShaderProgram.disableAttributeArray("normal");
 
-  lightingShaderProgram.release();
+  simpleShaderProgram.release();
 }
 
 void GlWidget::paintGL() {
@@ -130,7 +107,7 @@ void GlWidget::paintGL() {
 
   QVector3D lightPosition = lightTransformation * QVector3D(0, 1, 1);
 
-  drawLand(viewMatrix, mvMatrix, lightPosition);
+  drawLand(viewMatrix, mvMatrix);
   cubes[0]->Draw(viewMatrix, mvMatrix, lightPosition, pMatrix);
   QMatrix4x4 newmv = mvMatrix;
   newmv.translate(2, 0, 0);
