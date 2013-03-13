@@ -1,5 +1,4 @@
 #include "glWidget.h"
-#include "model.h"
 
 GlWidget::GlWidget(QWidget *parent)
   : QGLWidget(QGLFormat(/* Additional format options */), parent)
@@ -35,49 +34,15 @@ void GlWidget::initializeGL() {
   simpleShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/singleColourFragmentShader.fsh");
   simpleShaderProgram.link();
 
-  cubeVertices << QVector3D(-0.5, -0.5,  0.5) << QVector3D( 0.5, -0.5,  0.5) << QVector3D( 0.5,  0.5,  0.5) // Front
-           << QVector3D( 0.5,  0.5,  0.5) << QVector3D(-0.5,  0.5,  0.5) << QVector3D(-0.5, -0.5,  0.5)
-           << QVector3D( 0.5, -0.5, -0.5) << QVector3D(-0.5, -0.5, -0.5) << QVector3D(-0.5,  0.5, -0.5) // Back
-           << QVector3D(-0.5,  0.5, -0.5) << QVector3D( 0.5,  0.5, -0.5) << QVector3D( 0.5, -0.5, -0.5)
-           << QVector3D(-0.5, -0.5, -0.5) << QVector3D(-0.5, -0.5,  0.5) << QVector3D(-0.5,  0.5,  0.5) // Left
-           << QVector3D(-0.5,  0.5,  0.5) << QVector3D(-0.5,  0.5, -0.5) << QVector3D(-0.5, -0.5, -0.5)
-           << QVector3D( 0.5, -0.5,  0.5) << QVector3D( 0.5, -0.5, -0.5) << QVector3D( 0.5,  0.5, -0.5) // Right
-           << QVector3D( 0.5,  0.5, -0.5) << QVector3D( 0.5,  0.5,  0.5) << QVector3D( 0.5, -0.5,  0.5)
-           << QVector3D(-0.5,  0.5,  0.5) << QVector3D( 0.5,  0.5,  0.5) << QVector3D( 0.5,  0.5, -0.5) // Top
-           << QVector3D( 0.5,  0.5, -0.5) << QVector3D(-0.5,  0.5, -0.5) << QVector3D(-0.5,  0.5,  0.5)
-           << QVector3D(-0.5, -0.5, -0.5) << QVector3D( 0.5, -0.5, -0.5) << QVector3D( 0.5, -0.5,  0.5) // Bottom
-           << QVector3D( 0.5, -0.5,  0.5) << QVector3D(-0.5, -0.5,  0.5) << QVector3D(-0.5, -0.5, -0.5);
-
-  cubeNormals << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) // Front
-              << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1)
-              << QVector3D( 0,  0, -1) << QVector3D( 0,  0, -1) << QVector3D( 0,  0, -1) // Back
-              << QVector3D( 0,  0, -1) << QVector3D( 0,  0, -1) << QVector3D( 0,  0, -1)
-              << QVector3D(-1,  0,  0) << QVector3D(-1,  0,  0) << QVector3D(-1,  0,  0) // Left
-              << QVector3D(-1,  0,  0) << QVector3D(-1,  0,  0) << QVector3D(-1,  0,  0)
-              << QVector3D( 1,  0,  0) << QVector3D( 1,  0,  0) << QVector3D( 1,  0,  0) // Right
-              << QVector3D( 1,  0,  0) << QVector3D( 1,  0,  0) << QVector3D( 1,  0,  0)
-              << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0) // Top
-              << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0)
-              << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) // Bottom
-              << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0);
-
-  cubeColours << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) // Front
-          << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0)
-          << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) // Back
-          << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0)
-          << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) // Left
-          << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-          << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) // Right
-          << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-          << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) // Top
-          << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1)
-          << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) // Bottom
-          << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1);
+  cubes << new Model(&lightingShaderProgram) << new Model(&lightingShaderProgram);
 
   landVertices << QVector3D(-10, -0.5, -10) << QVector3D(-10, -0.5, 10) << QVector3D(10, -0.5, 10)
                << QVector3D(10, -0.5, 10) <<  QVector3D(10, -0.5, -10) << QVector3D(-10, -0.5, -10);
 
   landColours << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
+              << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0);
+
+  landNormals << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
               << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0);
 
 
@@ -122,78 +87,17 @@ void GlWidget::drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D li
   lightingShaderProgram.setUniformValue("ambientReflection", (GLfloat) 1.0);
   lightingShaderProgram.setUniformValue("diffuseReflection", (GLfloat) 1.0);
   lightingShaderProgram.setUniformValue("specularReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("shininess", (GLfloat) 100.0);
+  lightingShaderProgram.setUniformValue("shininess", (GLfloat) 20.0);
   lightingShaderProgram.setUniformValue("texture", 0);
 
   lightingShaderProgram.setAttributeArray("vertex", landVertices.constData());
   lightingShaderProgram.enableAttributeArray("vertex");
-  lightingShaderProgram.setAttributeArray("normal", cubeNormals.constData());
+  lightingShaderProgram.setAttributeArray("normal", landNormals.constData());
   lightingShaderProgram.enableAttributeArray("normal");
   lightingShaderProgram.setAttributeArray("colour", landColours.constData());
   lightingShaderProgram.enableAttributeArray("colour");
 
   glDrawArrays(GL_TRIANGLES, 0, landVertices.size());
-
-  lightingShaderProgram.disableAttributeArray("vertex");
-  lightingShaderProgram.disableAttributeArray("normal");
-
-  lightingShaderProgram.release();
-}
-
-void GlWidget::drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition) {
-    QMatrix3x3 normalMatrix;
-    normalMatrix = mvMatrix.normalMatrix();
-
-    Model m;
-    QVector<QVector3D> vertices = m.LoadFromCollada();
-
-    simpleShaderProgram.bind();
-
-    simpleShaderProgram.setUniformValue("mvpMatrix", pMatrix * mvMatrix);
-    simpleShaderProgram.setUniformValue("mvMatrix", mvMatrix);
-    simpleShaderProgram.setUniformValue("normalMatrix", normalMatrix);
-    simpleShaderProgram.setUniformValue("lightPosition", viewMatrix * lightPosition);
-
-    simpleShaderProgram.setUniformValue("color", QColor(Qt::darkGreen));
-
-    simpleShaderProgram.setAttributeArray("vertex", vertices.constData());
-    simpleShaderProgram.enableAttributeArray("vertex");
-
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
-    simpleShaderProgram.disableAttributeArray("vertex");
-
-    simpleShaderProgram.release();
-}
-
-void GlWidget::drawCube(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition) {
-  QMatrix3x3 normalMatrix;
-  normalMatrix = mvMatrix.normalMatrix();
-
-  lightingShaderProgram.bind();
-
-  lightingShaderProgram.setUniformValue("mvpMatrix", pMatrix * mvMatrix);
-  lightingShaderProgram.setUniformValue("mvMatrix", mvMatrix);
-  lightingShaderProgram.setUniformValue("normalMatrix", normalMatrix);
-  lightingShaderProgram.setUniformValue("lightPosition", viewMatrix * lightPosition);
-
-  lightingShaderProgram.setUniformValue("ambientColor", QColor(32, 32, 32));
-  lightingShaderProgram.setUniformValue("diffuseColor", QColor(128, 128, 128));
-  lightingShaderProgram.setUniformValue("specularColor", QColor(255, 255, 255));
-  lightingShaderProgram.setUniformValue("ambientReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("diffuseReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("specularReflection", (GLfloat) 1.0);
-  lightingShaderProgram.setUniformValue("shininess", (GLfloat) 100.0);
-  lightingShaderProgram.setUniformValue("texture", 0);
-
-  lightingShaderProgram.setAttributeArray("vertex", cubeVertices.constData());
-  lightingShaderProgram.enableAttributeArray("vertex");
-  lightingShaderProgram.setAttributeArray("normal", cubeNormals.constData());
-  lightingShaderProgram.enableAttributeArray("normal");
-  lightingShaderProgram.setAttributeArray("colour", cubeColours.constData());
-  lightingShaderProgram.enableAttributeArray("colour");
-
-  glDrawArrays(GL_TRIANGLES, 0, cubeVertices.size());
 
   lightingShaderProgram.disableAttributeArray("vertex");
   lightingShaderProgram.disableAttributeArray("normal");
@@ -214,7 +118,6 @@ void GlWidget::paintGL() {
   QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, distance);
   QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
 
-  // THE MIDDLE PARAMETER CAN PROBABLY USED TO PAN THE CAMERA
   viewMatrix.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
 
   mMatrix.setToIdentity();
@@ -227,13 +130,11 @@ void GlWidget::paintGL() {
 
   QVector3D lightPosition = lightTransformation * QVector3D(0, 1, 1);
 
-  drawModel(viewMatrix, mvMatrix, lightPosition);
-
   drawLand(viewMatrix, mvMatrix, lightPosition);
-  drawCube(viewMatrix, mvMatrix, lightPosition);
+  cubes[0]->Draw(viewMatrix, mvMatrix, lightPosition, pMatrix);
   QMatrix4x4 newmv = mvMatrix;
   newmv.translate(2, 0, 0);
-  drawCube(viewMatrix, newmv, lightPosition);
+  cubes[1]->Draw(viewMatrix, newmv, lightPosition, pMatrix);
 
   mMatrix.setToIdentity();
   mMatrix.translate(lightPosition);
