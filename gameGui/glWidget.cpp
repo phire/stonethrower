@@ -1,4 +1,5 @@
 #include "glWidget.h"
+#include "model.h"
 
 GlWidget::GlWidget(QWidget *parent)
   : QGLWidget(QGLFormat(/* Additional format options */), parent)
@@ -17,7 +18,7 @@ QSize GlWidget::sizeHint() const {
 
 void GlWidget::initializeGL() {
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_LINE_SMOOTH);
 
@@ -29,6 +30,10 @@ void GlWidget::initializeGL() {
   colouringShaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/vertexShader.vsh");
   colouringShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/fragmentShader.fsh");
   colouringShaderProgram.link();
+
+  simpleShaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/singleColourVertexShader.vsh");
+  simpleShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/singleColourFragmentShader.fsh");
+  simpleShaderProgram.link();
 
   cubeVertices << QVector3D(-0.5, -0.5,  0.5) << QVector3D( 0.5, -0.5,  0.5) << QVector3D( 0.5,  0.5,  0.5) // Front
            << QVector3D( 0.5,  0.5,  0.5) << QVector3D(-0.5,  0.5,  0.5) << QVector3D(-0.5, -0.5,  0.5)
@@ -135,6 +140,32 @@ void GlWidget::drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D li
   lightingShaderProgram.release();
 }
 
+void GlWidget::drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition) {
+    QMatrix3x3 normalMatrix;
+    normalMatrix = mvMatrix.normalMatrix();
+
+    Model m;
+    QVector<QVector3D> vertices = m.LoadFromCollada();
+
+    simpleShaderProgram.bind();
+
+    simpleShaderProgram.setUniformValue("mvpMatrix", pMatrix * mvMatrix);
+    simpleShaderProgram.setUniformValue("mvMatrix", mvMatrix);
+    simpleShaderProgram.setUniformValue("normalMatrix", normalMatrix);
+    simpleShaderProgram.setUniformValue("lightPosition", viewMatrix * lightPosition);
+
+    simpleShaderProgram.setUniformValue("color", QColor(Qt::darkGreen));
+
+    simpleShaderProgram.setAttributeArray("vertex", vertices.constData());
+    simpleShaderProgram.enableAttributeArray("vertex");
+
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+    simpleShaderProgram.disableAttributeArray("vertex");
+
+    simpleShaderProgram.release();
+}
+
 void GlWidget::drawCube(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition) {
   QMatrix3x3 normalMatrix;
   normalMatrix = mvMatrix.normalMatrix();
@@ -195,6 +226,8 @@ void GlWidget::paintGL() {
   lightTransformation.rotate(0.0, 0, 1, 0);
 
   QVector3D lightPosition = lightTransformation * QVector3D(0, 1, 1);
+
+  drawModel(viewMatrix, mvMatrix, lightPosition);
 
   drawLand(viewMatrix, mvMatrix, lightPosition);
   drawCube(viewMatrix, mvMatrix, lightPosition);

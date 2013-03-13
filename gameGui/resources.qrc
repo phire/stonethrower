@@ -4,5 +4,7 @@
         <file>vertexShader.vsh</file>
         <file>lightingFragmentShader.fsh</file>
         <file>lightingVertexShader.vsh</file>
+        <file>singleColourFragmentShader.fsh</file>
+        <file>singleColourVertexShader.vsh</file>
     </qresource>
 </RCC>

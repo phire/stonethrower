@@ -31,8 +31,11 @@ private:
   QVector<QVector3D> spotlightVertices;
   QVector<QVector3D> spotlightColours;
 
+  QGLShaderProgram simpleShaderProgram;
+
   void drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
   void drawCube(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
+  void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
 
   QMatrix4x4 pMatrix;
 
