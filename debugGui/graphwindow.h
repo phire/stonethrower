@@ -21,6 +21,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
+	void drawSection(QPainter *painter, const Section *s);
+
 private:
     QBackingStore *m_backingStore;
     bool m_update_pending;

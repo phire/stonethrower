@@ -175,3 +175,28 @@ Section::Section(QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2)
 	coords[2] = p2 + v2 * (SECTION_WIDTH * 3 + 0.012);
 	coords[3] = p1 + v1 * (SECTION_WIDTH * 3 + 0.012);
 }
+
+/* Based on Paul Bourkes "Determining if a point lines on the interior of a
+ * polygon" at http://paulbourke.net/geometry/polygonmesh/ (Soultion 3)
+ *
+ * A possible future optimisation would be to assure that sections always have
+ * the same winding direction. Then the best case can be massivly improved
+ * and the worst clase will have slightly less compares.
+ *     Best case:  4 multiplies, 10 subtractions, 4 compares
+ *     Worst case: 8 multiplies, 20 subtractions, 8 compares
+ */
+bool Section::containsPoint(QVector2D point) const {
+	float x = point.x(), y = point.y();
+	int side = 0; // 1 = left, 2 = right, 3 = both
+	for(int i=0, j=1; i < 4; j++, i++) {
+		// Calculate if the point is on the left or right side of each line
+		if((y - coords[i].y()) * (coords[j&3].x() - coords[i].x()) -
+		   (x - coords[i].x()) * (coords[j&3].y() - coords[i].y()) > 0.0) 
+				side |= 1; // left
+		else
+				side |= 2; // right
+		if(side == 3) // If point is not on the same side of all lines so far
+			return false; // then the point is not inside the polygon
+	}
+	return true;
+}

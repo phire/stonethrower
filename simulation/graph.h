@@ -64,6 +64,8 @@ public:
 	Section(): zone(Unzoned) {};
 	Section(QVector2D, QVector2D, QVector2D, QVector2D);
 
+	bool containsPoint(QVector2D) const;
+
 public:
 	int zone;
     int numTentants;
