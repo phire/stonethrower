@@ -54,7 +54,8 @@ public:
 	Intersection *start;
 	Intersection *end;
 	float length;
-	QVector<Section*> sections;
+    QVector<Section*> leftSections;
+    QVector<Section*> rightSections;
 };
 
 class Section {
@@ -64,7 +65,5 @@ public:
 
 public:
 	int zone;
-	
+    int numTentants;
 };
-
-

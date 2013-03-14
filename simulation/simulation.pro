@@ -6,5 +6,7 @@ DEFINES = SIMULATION_LIBRARY
 
 QMAKE_CXXFLAGS += -std=c++11
 
-SOURCES = graph.cpp
-HEADERS = graph.h
+SOURCES = graph.cpp \
+    savefile.cpp
+HEADERS = graph.h \
+    savefile.h
