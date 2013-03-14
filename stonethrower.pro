@@ -8,3 +8,4 @@ SUBDIRS = simulation \
     gameGui
 
 debugGui.depends = simulation
+gameGui.depends  = simulation

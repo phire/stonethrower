@@ -19,3 +19,7 @@ OTHER_FILES += \
 
 RESOURCES += \
     resources.qrc
+
+INCLUDEPATH += ../simulation
+LIBS += ../simulation/libsimulation.a
+PRE_TARGETDEPS += ../simulation/libsimulation.a

@@ -34,10 +34,10 @@ void GlWidget::initializeGL() {
   simpleShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/singleColourFragmentShader.fsh");
   simpleShaderProgram.link();
 
-  cubes << new Model(&lightingShaderProgram) << new Model(&lightingShaderProgram);
+  cubes << new Model(&lightingShaderProgram, 2, Qt::green) << new Model(&lightingShaderProgram, 1, Qt::blue);
 
-  landVertices << QVector3D(-1000, -0.5, -1000) << QVector3D(-1000, -0.5, 1000) << QVector3D(1000, -0.5, 1000)
-               << QVector3D(1000, -0.5, 1000) <<  QVector3D(1000, -0.5, -1000) << QVector3D(-1000, -0.5, -1000);
+  landVertices << QVector3D(-1000, 0, -1000) << QVector3D(-1000, 0, 1000) << QVector3D(1000, 0, 1000)
+               << QVector3D(1000, 0, 1000) <<  QVector3D(1000, 0, -1000) << QVector3D(-1000, 0, -1000);
 
   spotlightVertices << QVector3D(   0,    1,    0) << QVector3D(-0.5,    0,  0.5) << QVector3D( 0.5,    0,  0.5) // Front
                     << QVector3D(   0,    1,    0) << QVector3D( 0.5,    0, -0.5) << QVector3D(-0.5,    0, -0.5) // Back
