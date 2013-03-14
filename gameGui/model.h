@@ -4,7 +4,7 @@
 
 class Model {
 public:
-    Model(QGLShaderProgram* shaderProgram);
+    Model(QGLShaderProgram* shaderProgram, double height, QColor colour);
 
     QVector<QVector3D> LoadFromCollada();
 
@@ -13,6 +13,6 @@ private:
     QGLShaderProgram* shaderProgram;
 
     QVector<QVector3D> vertices;
-    QVector<QVector3D> colours;
     QVector<QVector3D> normals;
+    QColor colour;
 };

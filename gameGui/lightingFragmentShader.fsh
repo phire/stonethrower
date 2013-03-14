@@ -12,7 +12,7 @@ uniform sampler2D texture;
 varying vec3 varyingNormal;
 varying vec3 varyingLightDirection;
 varying vec3 varyingViewerDirection;
-varying vec4 varyingColour;
+uniform vec4 colour;
 
 //out vec4 fragColor;
 
@@ -26,5 +26,5 @@ void main(void)
     vec4 specularIllumination = specularReflection * pow(max(0.0,
                                                              dot(-reflect(lightDirection, normal), viewerDirection)
                                                              ), shininess) * specularColor;
-    gl_FragColor = varyingColour * (ambientIllumination + diffuseIllumination) + specularIllumination;
+    gl_FragColor = colour * (ambientIllumination + diffuseIllumination) + specularIllumination;
 }
