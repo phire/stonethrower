@@ -6,5 +6,6 @@
         <file>lightingVertexShader.vsh</file>
         <file>singleColourFragmentShader.fsh</file>
         <file>singleColourVertexShader.vsh</file>
+        <file>resources/onestreet.st</file>
     </qresource>
 </RCC>

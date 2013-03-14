@@ -6,18 +6,18 @@ Model::Model(QGLShaderProgram* shaderProgram, double height, QColor colour) {
     this->shaderProgram = shaderProgram;
     this->colour = colour;
 
-    vertices << QVector3D(-0.5, 0,  0.5) << QVector3D( 0.5, 0,  0.5) << QVector3D( 0.5,  height,  0.5) // Front
-             << QVector3D( 0.5, height,  0.5) << QVector3D(-0.5,  height,  0.5) << QVector3D(-0.5, 0,  0.5)
-             << QVector3D( 0.5, 0, -0.5) << QVector3D(-0.5, 0, -0.5) << QVector3D(-0.5,  height, -0.5) // Back
-             << QVector3D(-0.5, height, -0.5) << QVector3D( 0.5,  height, -0.5) << QVector3D( 0.5, 0, -0.5)
-             << QVector3D(-0.5, 0, -0.5) << QVector3D(-0.5, 0,  0.5) << QVector3D(-0.5,  height,  0.5) // Left
-             << QVector3D(-0.5, height,  0.5) << QVector3D(-0.5,  height, -0.5) << QVector3D(-0.5, 0, -0.5)
-             << QVector3D( 0.5, 0,  0.5) << QVector3D( 0.5, 0, -0.5) << QVector3D( 0.5,  height, -0.5) // Right
-             << QVector3D( 0.5, height, -0.5) << QVector3D( 0.5,  height,  0.5) << QVector3D( 0.5, 0,  0.5)
-             << QVector3D(-0.5, height,  0.5) << QVector3D( 0.5,  height,  0.5) << QVector3D( 0.5,  height, -0.5) // Top
-             << QVector3D( 0.5, height, -0.5) << QVector3D(-0.5, height, -0.5) << QVector3D(-0.5,  height,  0.5)
-             << QVector3D(-0.5, 0, -0.5) << QVector3D( 0.5, 0, -0.5) << QVector3D( 0.5, 0,  0.5) // Bottom
-             << QVector3D( 0.5, 0,  0.5) << QVector3D(-0.5, 0,  0.5) << QVector3D(-0.5, 0, -0.5);
+    vertices << QVector3D(-0.4, 0,  0.4) << QVector3D( 0.4, 0,  0.4) << QVector3D( 0.4,  height,  0.4) // Front
+             << QVector3D( 0.4, height,  0.4) << QVector3D(-0.4,  height,  0.4) << QVector3D(-0.4, 0,  0.4)
+             << QVector3D( 0.4, 0, -0.4) << QVector3D(-0.4, 0, -0.4) << QVector3D(-0.4,  height, -0.4) // Back
+             << QVector3D(-0.4, height, -0.4) << QVector3D( 0.4,  height, -0.4) << QVector3D( 0.4, 0, -0.4)
+             << QVector3D(-0.4, 0, -0.4) << QVector3D(-0.4, 0,  0.4) << QVector3D(-0.4,  height,  0.4) // Left
+             << QVector3D(-0.4, height,  0.4) << QVector3D(-0.4,  height, -0.4) << QVector3D(-0.4, 0, -0.4)
+             << QVector3D( 0.4, 0,  0.4) << QVector3D( 0.4, 0, -0.4) << QVector3D( 0.4,  height, -0.4) // Right
+             << QVector3D( 0.4, height, -0.4) << QVector3D( 0.4,  height,  0.4) << QVector3D( 0.4, 0,  0.4)
+             << QVector3D(-0.4, height,  0.4) << QVector3D( 0.4,  height,  0.4) << QVector3D( 0.4,  height, -0.4) // Top
+             << QVector3D( 0.4, height, -0.4) << QVector3D(-0.4, height, -0.4) << QVector3D(-0.4,  height,  0.4)
+             << QVector3D(-0.4, 0, -0.4) << QVector3D( 0.4, 0, -0.4) << QVector3D( 0.4, 0,  0.4) // Bottom
+             << QVector3D( 0.4, 0,  0.4) << QVector3D(-0.4, 0,  0.4) << QVector3D(-0.4, 0, -0.4);
 
     normals  << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) // Front
              << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1) << QVector3D( 0,  0,  1)
@@ -31,19 +31,6 @@ Model::Model(QGLShaderProgram* shaderProgram, double height, QColor colour) {
              << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0) << QVector3D( 0,  1,  0)
              << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) // Bottom
              << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0) << QVector3D( 0, -1,  0);
-
-/*    colours  << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) // Front
-             << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0)
-             << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) // Back
-             << QVector3D(1, 0, 0) << QVector3D(1, 0, 0) << QVector3D(1, 0, 0)
-             << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) // Left
-             << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-             << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) // Right
-             << QVector3D(0, 1, 0) << QVector3D(0, 1, 0) << QVector3D(0, 1, 0)
-             << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) // Top
-             << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1)
-             << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) // Bottom
-             << QVector3D(0, 0, 1) << QVector3D(0, 0, 1) << QVector3D(0, 0, 1);*/
 }
 
 QVector<QVector3D> Model::LoadFromCollada() {
@@ -84,3 +71,4 @@ void Model::Draw(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosi
 
     shaderProgram->release();
 }
+

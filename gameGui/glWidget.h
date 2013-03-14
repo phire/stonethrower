@@ -2,6 +2,8 @@
 
 #include <QtOpenGL>
 #include "model.h"
+#include "graph.h"
+#include "building.h"
 
 class GlWidget : public QGLWidget {
   Q_OBJECT
@@ -32,11 +34,12 @@ private:
   void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
 
   QMatrix4x4 pMatrix;
-
-  QVector<Model*> cubes;
+  QList<Road*> roads;
 
   double alpha;
   double beta;
   double distance;
   QPoint lastMousePosition;
+
+  BuildingFactory buildingFactory;
 };

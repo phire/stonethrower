@@ -1,13 +1,20 @@
+TEMPLATE = app
+
+TARGET = stonethrower
+DESTDIR = ../
+
 QT += opengl
 
 SOURCES += \
     main.cpp \
     glWidget.cpp \
-    model.cpp
+    model.cpp \
+    building.cpp
 
 HEADERS += \
     glWidget.h \
-    model.h
+    model.h \
+    building.h
 
 OTHER_FILES += \
     vertexShader.vsh \

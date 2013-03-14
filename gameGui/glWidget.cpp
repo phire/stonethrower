@@ -1,4 +1,5 @@
 #include "glWidget.h"
+#include "savefile.h"
 
 GlWidget::GlWidget(QWidget *parent)
   : QGLWidget(QGLFormat(/* Additional format options */), parent)
@@ -6,6 +7,9 @@ GlWidget::GlWidget(QWidget *parent)
   alpha = 25;
   beta= -25;
   distance = 2.5;
+
+  SaveFile* file = new SaveFile(":/resources/onestreet.st");
+  roads = file->GetRoads();
 }
 
 GlWidget::~GlWidget() {
@@ -33,8 +37,6 @@ void GlWidget::initializeGL() {
   simpleShaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/singleColourVertexShader.vsh");
   simpleShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/singleColourFragmentShader.fsh");
   simpleShaderProgram.link();
-
-  cubes << new Model(&lightingShaderProgram, 2, Qt::green) << new Model(&lightingShaderProgram, 1, Qt::blue);
 
   landVertices << QVector3D(-1000, 0, -1000) << QVector3D(-1000, 0, 1000) << QVector3D(1000, 0, 1000)
                << QVector3D(1000, 0, 1000) <<  QVector3D(1000, 0, -1000) << QVector3D(-1000, 0, -1000);
@@ -108,10 +110,19 @@ void GlWidget::paintGL() {
   QVector3D lightPosition = lightTransformation * QVector3D(0, 1, 1);
 
   drawLand(viewMatrix, mvMatrix);
-  cubes[0]->Draw(viewMatrix, mvMatrix, lightPosition, pMatrix);
-  QMatrix4x4 newmv = mvMatrix;
-  newmv.translate(2, 0, 0);
-  cubes[1]->Draw(viewMatrix, newmv, lightPosition, pMatrix);
+  QMatrix4x4 currentMatrix = mvMatrix;
+  foreach(Section* section, roads[0]->leftSections) {
+      Building* building = buildingFactory.GetBuilding(section->zone, section->numTentants);
+
+      if(building == NULL)
+          continue;
+
+      Model m(&lightingShaderProgram, building->GetHeight(), building->GetColour());
+      m.Draw(viewMatrix, currentMatrix, lightPosition, pMatrix);
+      currentMatrix.translate(1, 0, 0);
+  }
+
+  printf("\n\n");
 
   mMatrix.setToIdentity();
   mMatrix.translate(lightPosition);
