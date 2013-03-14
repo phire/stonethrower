@@ -41,7 +41,7 @@ public:
 
 public:
 	QSet<Road*> edges;
-	QVector2D pos; // note to self, check QPoint generates optimal code
+	QVector2D pos; 
 };
 
 class Road { // aka edge
@@ -62,8 +62,10 @@ class Section {
 public:
 	enum zone {Unzoned, Residential, Commercial, Industrial};
 	Section(): zone(Unzoned) {};
+	Section(QVector2D, QVector2D, QVector2D, QVector2D);
 
 public:
 	int zone;
     int numTentants;
+	QVector2D coords[4];
 };

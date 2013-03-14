@@ -42,12 +42,36 @@ void GraphWindow::renderNow() {
 
 void GraphWindow::render(QPainter *painter) {
     static QPen roadPen(Qt::SolidPattern, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-    painter->setPen(roadPen);
+	static QPen sectionPen(Qt::green, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+
     for(int i = 0; i < graph.edges.size(); i++) {
-		auto coords = graph.edges.at(i)->getCoords();
+		painter->setPen(roadPen);
+		Road *road = graph.edges.at(i);
+		auto coords = road->getCoords();
         painter->drawLine(((*coords[0]) * scale).toPoint(), 
 						  ((*coords[1]) * scale).toPoint());
+
+		painter->setPen(sectionPen);
+		for(int j = 0; j < road->leftSections.size(); j++) {
+			Section *l = road->leftSections.at(j);
+			if(!l) continue;
+			QPointF pointsl[5] = {(l->coords[0] * scale).toPoint(),
+							 	 (l->coords[1] * scale).toPoint(),
+							 	 (l->coords[2] * scale).toPoint(),
+							 	 (l->coords[3] * scale).toPoint(),
+								 (l->coords[0] * scale).toPoint()};
+			painter->drawPolyline(pointsl, 5);
+
+			Section *r = road->rightSections.at(j);
+			QPointF pointsr[5] = {(r->coords[0] * scale).toPoint(),
+							 	 (r->coords[1] * scale).toPoint(),
+							 	 (r->coords[2] * scale).toPoint(),
+							 	 (r->coords[3] * scale).toPoint(),
+								 (r->coords[0] * scale).toPoint()};
+			painter->drawPolyline(pointsr, 5);
+		} 
     }
+	painter->setPen(roadPen);
 
     if(showGuide)
         painter->drawLine((edgeStart->pos*scale).toPoint(), mouseCurrent);

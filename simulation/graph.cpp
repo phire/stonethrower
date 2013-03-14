@@ -1,4 +1,7 @@
 #include "graph.h"
+#include <math.h>
+
+#define SECTION_WIDTH 0.030
 
 void Graph::addNode(Intersection *node) {
 	nodes << node;
@@ -99,9 +102,34 @@ QPoint Intersection::toPoint() const {
 }
 
 Road::Road(Intersection *n1, Intersection *n2) : start(n1), end(n2) {
-	length = (n1->pos - n2->pos).length();
+	QVector2D vec = (n2->pos - n1->pos);
+	length = vec.length();
 	n1->addEdge(this);
 	n2->addEdge(this);
+
+	// Create Sections
+	int numSections = truncf(length / SECTION_WIDTH);
+	float sectionWidth = length / numSections;
+
+	// Note: qvector over allocates.
+	// later, it might be smart to squeeze() them to save memory
+	// or use fixed size arrays on the heap
+	leftSections.resize(numSections);
+	rightSections.resize(numSections);
+
+	vec = vec.normalized();
+	QVector2D leftVec(vec.y(), -vec.x());
+	QVector2D rightVec(-vec.y(), vec.x());
+	QVector2D unitVec = vec * sectionWidth;
+
+	QVector2D start = n1->pos;
+	for(int i=0; i < numSections; i++) {
+		QVector2D end = start + unitVec;
+		// For curved roads, vectors will be calculated for each point.
+		leftSections[i]  = new Section(start, end, leftVec, leftVec);
+		rightSections[i] = new Section(start, end, rightVec, rightVec);
+		start = end;
+	}
 }
 
 std::array<QVector2D*, 2> Road::getCoords() const {
@@ -140,3 +168,10 @@ bool Road::intersect(Road *other, QVector2D *at) {
 	return true;
 }
 
+Section::Section(QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2) 
+	: zone(Unzoned), numTentants(0) {
+	coords[0] = p1 + v1 * .012;
+	coords[1] = p2 + v2 * .012;
+	coords[2] = p2 + v2 * (SECTION_WIDTH * 3 + 0.012);
+	coords[3] = p1 + v1 * (SECTION_WIDTH * 3 + 0.012);
+}
