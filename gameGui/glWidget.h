@@ -41,5 +41,14 @@ private:
   double distance;
   QPoint lastMousePosition;
 
+  double moveUp, moveLeft;
+
+  bool panUp, panDown, panLeft, panRight;
+
   BuildingFactory buildingFactory;
+
+  QTimer* panTimer;
+
+private slots:
+  void updatePan();
 };

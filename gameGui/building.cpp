@@ -23,9 +23,6 @@ Building* BuildingFactory::GetBuilding(int type, int numTenants) {
     if(buildings.count() == 0)
         InitBuildings();
 
-    printf("Building count: %d, type: %d\n", buildings.count(), type);
-    fflush(stdout);
-
     if(buildings.count() <= type || type == 0)
         return NULL;
 

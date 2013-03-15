@@ -1,7 +1,3 @@
-TEMPLATE = app
-
-TARGET = stonethrower
-DESTDIR = ../
 
 QT += opengl
 

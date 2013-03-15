@@ -8,15 +8,24 @@ GlWidget::GlWidget(QWidget *parent)
   beta= -25;
   distance = 2.5;
 
+  moveUp = 0.0;
+  moveLeft = 0.0;
+
   SaveFile* file = new SaveFile(":/resources/onestreet.st");
   roads = file->GetRoads();
+
+  setMouseTracking(true);
+
+  panUp = panDown = panLeft = panRight = false;
+  panTimer = new QTimer(this);
+  connect(panTimer, SIGNAL(timeout()), this, SLOT(updatePan()));
 }
 
 GlWidget::~GlWidget() {
 }
 
 QSize GlWidget::sizeHint() const {
-  return QSize(640, 480);
+  return QSize(800, 600);
 }
 
 void GlWidget::initializeGL() {
@@ -109,6 +118,8 @@ void GlWidget::paintGL() {
 
   QVector3D lightPosition = lightTransformation * QVector3D(0, 1, 1);
 
+  mvMatrix.translate(moveLeft, 0, moveUp);
+
   drawLand(viewMatrix, mvMatrix);
   QMatrix4x4 currentMatrix = mvMatrix;
   foreach(Section* section, roads[0]->leftSections) {
@@ -121,8 +132,6 @@ void GlWidget::paintGL() {
       m.Draw(viewMatrix, currentMatrix, lightPosition, pMatrix);
       currentMatrix.translate(1, 0, 0);
   }
-
-  printf("\n\n");
 
   mMatrix.setToIdentity();
   mMatrix.translate(lightPosition);
@@ -171,6 +180,18 @@ void GlWidget::mouseMoveEvent(QMouseEvent *event) {
     updateGL();
   }
 
+  panUp    = (event->y() < 20);
+  panDown  = (event->y() > (height() - 20));
+  panLeft  = (event->x() < 20);
+  panRight = (event->x() > (width() - 20));
+
+  bool shouldPan = (panLeft || panRight || panUp || panDown);
+
+  if(shouldPan && !panTimer->isActive())
+      panTimer->start(10);
+  else if(!shouldPan && panTimer->isActive())
+      panTimer->stop();
+
   lastMousePosition = event->pos();
   event->accept();
 }
@@ -188,4 +209,20 @@ void GlWidget::wheelEvent(QWheelEvent *event) {
   }
 
   event->accept();
+}
+
+void GlWidget::updatePan() {
+    double angle = alpha;
+
+    if(panDown)
+        angle += 180;
+    else if(panLeft)
+        angle += 90;
+    else if(panRight)
+        angle += 270;
+
+    double angleInRads = (angle * M_PI)/180.0;
+    moveUp   += (cos(angleInRads) * 0.05);
+    moveLeft += (sin(angleInRads) * 0.05);
+    updateGL();
 }
