@@ -24,5 +24,7 @@ RESOURCES += \
     resources.qrc
 
 INCLUDEPATH += ../simulation
-LIBS += ../simulation/libsimulation.a
+LIBS += ../simulation/libsimulation.a -lGLU
 PRE_TARGETDEPS += ../simulation/libsimulation.a
+
+QMAKE_CXXFLAGS += -std=c++11

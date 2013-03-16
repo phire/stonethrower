@@ -1,9 +1,9 @@
 #include "glWidget.h"
 #include "savefile.h"
-#include "glu.h"
+#include "GL/glu.h"
 
 GlWidget::GlWidget(QWidget *parent)
-  : QGLWidget(QGLFormat(/* Additional format options */), parent)
+  : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
   alpha = 25;
   beta= -25;
