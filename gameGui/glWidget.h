@@ -33,7 +33,8 @@ private:
   void drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix);
   void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
 
-  QMatrix4x4 pMatrix;
+  void HandleLeftClick(int mouseX, int mouseY);
+  QMatrix4x4 projectionMatrix;
   QList<Road*> roads;
 
   double alpha;
@@ -48,6 +49,9 @@ private:
   BuildingFactory buildingFactory;
 
   QTimer* panTimer;
+  QMatrix4x4 mvMatrix;
+
+  QList<QVector3D> buildings;
 
 private slots:
   void updatePan();

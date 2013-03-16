@@ -1,5 +1,6 @@
 #include "glWidget.h"
 #include "savefile.h"
+#include "glu.h"
 
 GlWidget::GlWidget(QWidget *parent)
   : QGLWidget(QGLFormat(/* Additional format options */), parent)
@@ -69,8 +70,8 @@ void GlWidget::resizeGL(int width, int height) {
     height = 1;
   }
 
-  pMatrix.setToIdentity();
-  pMatrix.perspective(60.0, (float) width / (float) height, 0.001, 1000);
+  projectionMatrix.setToIdentity();
+  projectionMatrix.perspective(60.0, (float) width / (float) height, 0.001, 1000);
   glViewport(0, 0, width, height);
 }
 
@@ -79,7 +80,7 @@ void GlWidget::drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix) {
   normalMatrix = mvMatrix.normalMatrix();
 
   simpleShaderProgram.bind();
-  simpleShaderProgram.setUniformValue("mvpMatrix", pMatrix * viewMatrix);
+  simpleShaderProgram.setUniformValue("mvpMatrix", projectionMatrix * viewMatrix);
   simpleShaderProgram.setAttributeArray("vertex", landVertices.constData());
   simpleShaderProgram.enableAttributeArray("vertex");
   simpleShaderProgram.setUniformValue("color", QColor(193, 232, 191));
@@ -110,7 +111,6 @@ void GlWidget::paintGL() {
 
   mMatrix.setToIdentity();
 
-  QMatrix4x4 mvMatrix;
   mvMatrix = viewMatrix * mMatrix;
 
   QMatrix4x4 lightTransformation;
@@ -129,8 +129,21 @@ void GlWidget::paintGL() {
           continue;
 
       Model m(&lightingShaderProgram, building->GetHeight(), building->GetColour());
-      m.Draw(viewMatrix, currentMatrix, lightPosition, pMatrix);
+      m.Draw(viewMatrix, currentMatrix, lightPosition, projectionMatrix);
       currentMatrix.translate(1, 0, 0);
+  }
+
+  foreach(QVector3D location, buildings) {
+      Building* building = buildingFactory.GetBuilding(1, 1);
+
+      if(building == NULL)
+          continue;
+
+      Model m(&lightingShaderProgram, building->GetHeight(), building->GetColour());
+      QMatrix4x4 loc = mvMatrix;
+      loc.translate(location.x(), 0, location.z());
+
+      m.Draw(viewMatrix, loc, lightPosition, projectionMatrix);
   }
 
   mMatrix.setToIdentity();
@@ -140,7 +153,7 @@ void GlWidget::paintGL() {
   mMatrix.scale(0.1);
 
   colouringShaderProgram.bind();
-  colouringShaderProgram.setUniformValue("mvpMatrix", pMatrix * viewMatrix * mMatrix);
+  colouringShaderProgram.setUniformValue("mvpMatrix", projectionMatrix * viewMatrix * mMatrix);
   colouringShaderProgram.setAttributeArray("vertex", spotlightVertices.constData());
   colouringShaderProgram.enableAttributeArray("vertex");
   colouringShaderProgram.setAttributeArray("color", spotlightColours.constData());
@@ -155,6 +168,10 @@ void GlWidget::paintGL() {
 
 void GlWidget::mousePressEvent(QMouseEvent *event) {
   lastMousePosition = event->pos();
+
+  if(event->buttons() & Qt::LeftButton)
+      HandleLeftClick(event->x(), event->y());
+
   event->accept();
 }
 
@@ -224,5 +241,37 @@ void GlWidget::updatePan() {
     double angleInRads = (angle * M_PI)/180.0;
     moveUp   += (cos(angleInRads) * 0.05);
     moveLeft += (sin(angleInRads) * 0.05);
+    updateGL();
+}
+
+void GlWidget::HandleLeftClick(int mouseX, int mouseY) {
+    // OpenGL coords start from the bottom right
+    mouseY = height() - mouseY;
+
+    GLdouble modelViewMatrix[16];
+    GLdouble projectionMatrix[16];
+    int viewport[4];
+
+    for(int i = 0; i < 16; i++) {
+        projectionMatrix[i] = this->projectionMatrix.data()[i];
+        modelViewMatrix[i]  = this->mvMatrix.data()[i];
+    }
+
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    GLdouble x1, y1, z1;
+    gluUnProject(mouseX, mouseY, 0.0, modelViewMatrix, projectionMatrix,
+        viewport, &x1, &y1, &z1);
+
+    GLdouble x2, y2, z2;
+    gluUnProject(mouseX, mouseY, 1.0, modelViewMatrix, projectionMatrix,
+        viewport, &x2, &y2, &z2);
+
+    // assume they've clicked on the land, where y = 0 and solve for x and z
+    // uses the formula from http://www.netcomuk.co.uk/~jenolive/vect17.html
+    double x = ((-1.0*x2*y1)/y2)+x1;
+    double z = ((-1.0*z2*y1)/y2)+z1;
+
+    buildings.push_back(QVector3D(x, 0, z));
     updateGL();
 }
