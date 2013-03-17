@@ -18,13 +18,22 @@ OTHER_FILES += \
     lightingVertexShader.vsh \
     lightingFragmentShader.fsh \
     singleColourVertexShader.vsh \
-    singleColourFragmentShader.fsh
+    singleColourFragmentShader.fsh \
+    resources/car.obj
 
 RESOURCES += \
     resources.qrc
 
 INCLUDEPATH += ../simulation
-LIBS += ../simulation/libsimulation.a -lGLU
+LIBS += ../simulation/libsimulation.a
 PRE_TARGETDEPS += ../simulation/libsimulation.a
+
+unix {
+    macx {
+    }
+    else {
+       LIBS += -lGLU
+    }
+}
 
 QMAKE_CXXFLAGS += -std=c++11

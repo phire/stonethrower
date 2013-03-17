@@ -52,6 +52,7 @@ private:
   QMatrix4x4 mvMatrix;
 
   QList<QVector3D> buildings;
+  Model* teapot;
 
 private slots:
   void updatePan();

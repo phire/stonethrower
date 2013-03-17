@@ -4,7 +4,7 @@
 
 class Model {
 public:
-    Model(QGLShaderProgram* shaderProgram, double height, QColor colour);
+    Model(QGLShaderProgram* shaderProgram, double height, QColor colour, QString modelFile = "");
 
     QVector<QVector3D> LoadFromCollada();
 
@@ -15,4 +15,8 @@ private:
     QVector<QVector3D> vertices;
     QVector<QVector3D> normals;
     QColor colour;
+
+    void LoadObj(QString path);
+    double min(double one, double two);
+    double max(double one, double two);
 };

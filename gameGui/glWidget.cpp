@@ -1,6 +1,10 @@
 #include "glWidget.h"
 #include "savefile.h"
-#include "GL/glu.h"
+#ifdef __APPLE__
+    #include "glu.h"
+#else
+    #include "GL/glu.h"
+#endif
 
 GlWidget::GlWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -63,6 +67,8 @@ void GlWidget::initializeGL() {
                     << QVector3D(0.2, 0.2, 0.2) << QVector3D(0.2, 0.2, 0.2) << QVector3D(0.2, 0.2, 0.2) // Right
                     << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) // Bottom
                     << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1);
+
+  teapot = new Model(&lightingShaderProgram, 0, Qt::gray, ":/resources/teapot.obj");
 }
 
 void GlWidget::resizeGL(int width, int height) {
@@ -139,11 +145,10 @@ void GlWidget::paintGL() {
       if(building == NULL)
           continue;
 
-      Model m(&lightingShaderProgram, building->GetHeight(), building->GetColour());
       QMatrix4x4 loc = mvMatrix;
       loc.translate(location.x(), 0, location.z());
 
-      m.Draw(viewMatrix, loc, lightPosition, projectionMatrix);
+      teapot->Draw(viewMatrix, loc, lightPosition, projectionMatrix);
   }
 
   mMatrix.setToIdentity();
