@@ -21,6 +21,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
+    void keyReleaseEvent(QKeyEvent *);
+
 	void drawSection(QPainter *painter, const Section *s);
 
 private:
@@ -32,4 +34,5 @@ private:
     bool showGuide;
     Graph graph;
 	float scale;
+    int mode;
 };

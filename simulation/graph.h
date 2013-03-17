@@ -17,6 +17,7 @@ public:
 
 	Intersection* nodeAt(QVector2D);
 	Road* roadAt(QVector2D);
+    Section* sectionAt(QVector2D);
 
 private:
 	void splitEdges(Road *newEdge);
@@ -50,6 +51,7 @@ public:
 	
 	std::array<QVector2D*, 2> getCoords() const;
 	bool intersect(Road *other, QVector2D *at);
+    float distance(QVector2D);
 	
 	Intersection *start;
 	Intersection *end;
@@ -62,12 +64,13 @@ class Section {
 public:
 	enum zone {Unzoned, Residential, Commercial, Industrial};
 	Section(): zone(Unzoned) {};
-	Section(QVector2D, QVector2D, QVector2D, QVector2D);
+    Section(Road*, QVector2D, QVector2D, QVector2D, QVector2D);
 
 	bool containsPoint(QVector2D) const;
 
 public:
 	int zone;
     int numTentants;
+    Road *road;
 	QVector2D coords[4];
 };

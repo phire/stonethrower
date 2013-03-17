@@ -54,6 +54,8 @@ void Graph::splitEdges(Road *newEdge) {
 
 Road* Graph::split(Road *edge1, Road *edge2, const QVector2D at) {
 	Intersection *n = nodeAt(at); 
+    if(n == edge1->start || n == edge1->end || n == edge2->start || n == edge2->end)
+        return edge1;
 	if(!n)
 		n = new Intersection(at);
 	edge2->end->delEdge(edge2);
@@ -82,8 +84,41 @@ Intersection* Graph::nodeAt(QVector2D v) {
 	return NULL;
 }
 
-Road* Graph::roadAt(QVector2D) {
-	return NULL;
+Road* Graph::roadAt(QVector2D p) {
+    float minDist = 1000000000000.0; // big number
+    Road *closestRoad;
+    for(Road *road : edges) {
+        float dist = road->distance(p);
+        if(dist < minDist) {
+            closestRoad = road;
+            minDist = dist;
+        }
+    }
+    return closestRoad;
+}
+
+Section *Graph::sectionAt(QVector2D p) {
+    float minDist = 1000000000000.0; // big number
+    Section *section = NULL;
+    for(Road *r : edges) {
+        for(Section *s : r->leftSections)
+            if(s->containsPoint( p)) {
+                float dist = s->road->distance(p);
+                if (dist < minDist) {
+                    minDist = dist;
+                    section = s;
+                }
+            }
+        for(Section *s : r->rightSections)
+            if(s->containsPoint( p)) {
+                float dist = s->road->distance(p);
+                if (dist < minDist) {
+                    minDist = dist;
+                    section = s;
+                }
+            }
+    }
+    return section;
 }
 
 Intersection::Intersection(QVector2D p) : pos(p) {}
@@ -126,8 +161,8 @@ Road::Road(Intersection *n1, Intersection *n2) : start(n1), end(n2) {
 	for(int i=0; i < numSections; i++) {
 		QVector2D end = start + unitVec;
 		// For curved roads, vectors will be calculated for each point.
-		leftSections[i]  = new Section(start, end, leftVec, leftVec);
-		rightSections[i] = new Section(start, end, rightVec, rightVec);
+        leftSections[i]  = new Section(this, start, end, leftVec, leftVec);
+        rightSections[i] = new Section(this, start, end, rightVec, rightVec);
 		start = end;
 	}
 }
@@ -165,11 +200,22 @@ bool Road::intersect(Road *other, QVector2D *at) {
 		return false;
 
 	*at = QVector2D(x1 + mua * (x2 - x1), y1 + mua * (y2 - y1));
-	return true;
+    return true;
 }
 
-Section::Section(QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2) 
-	: zone(Unzoned), numTentants(0) {
+float Road::distance(QVector2D p) {
+    float x1 = start->pos.x(), y1 = start->pos.y();
+    float x2 = end->pos.x(), y2 = end->pos.y();
+    float x3 = p.x(), y3 = p.y();
+
+    float u = ((x3 - x1) * (x2 - x1) + (y3 - y1) * (y2 - y1)) / (length * length);
+
+    QVector2D intersection = QVector2D(x1 + u * (x2 - x1), y1 + u * (y2 - y1));
+    return (intersection - p).length();
+}
+
+Section::Section(Road *r, QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2)
+    : road(r), zone(Unzoned), numTentants(0) {
 	coords[0] = p1 + v1 * .012;
 	coords[1] = p2 + v2 * .012;
 	coords[2] = p2 + v2 * (SECTION_WIDTH * 3 + 0.012);

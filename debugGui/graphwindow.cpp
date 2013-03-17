@@ -8,6 +8,7 @@ GraphWindow::GraphWindow(QWindow *parent)
 
     resize(1000, 600);
 	scale = 1000;
+    mode = 1;
 
 	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(renderLater()));
 }
@@ -41,18 +42,41 @@ void GraphWindow::renderNow() {
 }
 
 void GraphWindow::drawSection(QPainter *painter, const Section *s) {
-	static QPen unzonedPen(Qt::gray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-	static QPen residentialPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    QPointF points[5] = {(s->coords[0] * scale).toPoint(),
+                         (s->coords[1] * scale).toPoint(),
+                         (s->coords[2] * scale).toPoint(),
+                         (s->coords[3] * scale).toPoint(),
+                         (s->coords[0] * scale).toPoint()};
 
-	if(s->containsPoint(QVector2D(mouseCurrent)/scale))
-		painter->setPen(residentialPen);
-	else
-		painter->setPen(unzonedPen);
-	QPointF points[5] = {(s->coords[0] * scale).toPoint(),
-						 (s->coords[1] * scale).toPoint(),
-						 (s->coords[2] * scale).toPoint(),
-						 (s->coords[3] * scale).toPoint(),
-						 (s->coords[0] * scale).toPoint()};
+    static QPen highlightPen(Qt::SolidPattern, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+
+    if(s->containsPoint(QVector2D(mouseCurrent)/scale)) {
+        painter->setPen(highlightPen);
+        painter->drawPolyline(points, 5);
+    }
+
+
+	static QPen unzonedPen(Qt::gray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    static QPen residentialPen(Qt::green, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    static QPen commercialPen(Qt::blue, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    static QPen industrialPen(Qt::yellow, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+
+    switch(s->zone) {
+    case Section::Unzoned:
+        return; // return
+        painter->setPen(unzonedPen);
+        break;
+    case Section::Residential:
+        painter->setPen(residentialPen);
+        break;
+    case Section::Commercial:
+        painter->setPen(commercialPen);
+        break;
+    case Section::Industrial:
+        painter->setPen(industrialPen);
+        break;
+    }
+
 	painter->drawPolyline(points, 5);
 
 }
@@ -102,32 +126,72 @@ bool GraphWindow::event(QEvent *event)
 }
 
 void GraphWindow::mousePressEvent(QMouseEvent *e) {
-    if(e->button() == Qt::LeftButton) {
-		auto v = QVector2D(e->pos()) / scale;
-        edgeStart = graph.nodeAt(v);
-		if(!edgeStart)
-			edgeStart = new Intersection(v);
-        showGuide = true;
+    switch(mode) {
+    case 1:
+        if(e->button() == Qt::LeftButton) {
+            auto v = QVector2D(e->pos()) / scale;
+            edgeStart = graph.nodeAt(v);
+            if(!edgeStart)
+                edgeStart = new Intersection(v);
+            showGuide = true;
+        }
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        if(e->button() == Qt::LeftButton) {
+            auto v = QVector2D(e->pos()) / scale;
+            auto s = graph.sectionAt(v);
+            if(!s)
+                return;
+            s->zone = (mode - 2) + Section::Unzoned;
+        }
+        break;
     }
 }
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
-    if(e->button() == Qt::LeftButton) {
-        showGuide = false;
-		auto v = QVector2D(e->pos()) / scale;
-		if((v - edgeStart->pos).length() < 0.024) {
-			if (edgeStart->edges.size() == 0)
-				delete edgeStart;
-			return;
-		}
-		Intersection *edgeEnd = graph.nodeAt(v);
-		if(!edgeEnd)
-			edgeEnd = new Intersection(v);
-		graph.addEdge(edgeStart, edgeEnd);
+    switch(mode) {
+    case 1:
+        if(e->button() == Qt::LeftButton) {
+            showGuide = false;
+            auto v = QVector2D(e->pos()) / scale;
+            if((v - edgeStart->pos).length() < 0.024) {
+                if (edgeStart->edges.size() == 0)
+                    delete edgeStart;
+                return;
+            }
+            Intersection *edgeEnd = graph.nodeAt(v);
+            if(!edgeEnd)
+                edgeEnd = new Intersection(v);
+            graph.addEdge(edgeStart, edgeEnd);
+        }
+        break;
     }
 }
 
 void GraphWindow::mouseMoveEvent(QMouseEvent *e) {
     mouseCurrent = e->pos();
 	renderLater();
+}
+
+void GraphWindow::keyReleaseEvent(QKeyEvent *e) {
+    switch(e->key()) {
+    case Qt::Key_1:
+        mode = 1;
+        break;
+    case Qt::Key_2:
+        mode = 2;
+        break;
+    case Qt::Key_3:
+        mode = 3;
+        break;
+    case Qt::Key_4:
+        mode = 4;
+        break;
+    case Qt::Key_5:
+        mode = 5;
+        break;
+    }
 }
