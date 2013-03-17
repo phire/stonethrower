@@ -116,7 +116,8 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *e) {
         showGuide = false;
 		auto v = QVector2D(e->pos()) / scale;
 		if((v - edgeStart->pos).length() < 0.024) {
-			delete edgeStart;
+			if (edgeStart->edges.size() == 0)
+				delete edgeStart;
 			return;
 		}
 		Intersection *edgeEnd = graph.nodeAt(v);
