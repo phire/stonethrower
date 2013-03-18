@@ -28,15 +28,16 @@ void Graph::addEdge(Intersection *n1, Intersection *n2) {
 
 	splitEdges(edge);
 
-    Dijkstras gen(this);
-    FloydWarshall check(this);
-    if(pathTable) delete pathTable;
+    FloydWarshall gen(this);
+    Dijkstras check(this);
+    delete pathTable; // Note: put a lock around this
     pathTable = gen.table;
     float *checkTable = check.table;
 
-    for(int i=0; i < Intersection::count*Intersection::count; i++)
-        if(fabsf(pathTable[i] - checkTable[i]) > 0.00001)
-            qDebug("[%d,%d] : d = %f, f = %f", i / Intersection::count, i % Intersection::count, pathTable[i], checkTable[i]);
+    for(int i=0; i < Intersection::count; i++)
+        for(int j=0; j < Intersection::count; j++)
+            if(fabsf(checkTable[i*Intersection::count + j] - pathTable[i*gen.width+j]) > 0.00001)
+                qDebug("[%i,%i] d: %f f: %f", i, j, checkTable[i*Intersection::count + j], pathTable[i*gen.width+j]);
 
 	emit changed();
 }
