@@ -29,6 +29,8 @@ signals:
 public:
 	QSet<Intersection*> nodes;
 	QList<Road*> edges;
+
+    float *pathTable = new float[0];
 };
 
 class Intersection { // aka node
@@ -42,7 +44,9 @@ public:
 
 public:
 	QSet<Road*> edges;
-	QVector2D pos; 
+    QVector2D pos;
+    int num;
+    static int count;
 };
 
 class Road { // aka edge
@@ -63,7 +67,7 @@ public:
 class Section {
 public:
 	enum zone {Unzoned, Residential, Commercial, Industrial};
-	Section(): zone(Unzoned) {};
+    Section(): zone(Unzoned) {}
     Section(Road*, QVector2D, QVector2D, QVector2D, QVector2D);
 
 	bool containsPoint(QVector2D) const;

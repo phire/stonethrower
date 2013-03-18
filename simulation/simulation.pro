@@ -7,6 +7,10 @@ DEFINES = SIMULATION_LIBRARY
 QMAKE_CXXFLAGS += -std=c++11
 
 SOURCES = graph.cpp \
-    savefile.cpp
+    savefile.cpp \
+    dijkstras.cpp
 HEADERS = graph.h \
-    savefile.h
+    savefile.h \
+    gheap/gpriority_queue.hpp \
+    gheap/gheap_cpp11.hpp \
+    dijkstras.h

@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "dijkstras.h"
 #include <math.h>
 
 #define SECTION_WIDTH 0.030
@@ -25,6 +26,10 @@ void Graph::addEdge(Intersection *n1, Intersection *n2) {
 	nodes.insert(n2);
 
 	splitEdges(edge);
+
+    Dijkstras gen(this);
+    if(pathTable) delete pathTable;
+    pathTable = gen.table;
 
 	emit changed();
 }
@@ -121,7 +126,8 @@ Section *Graph::sectionAt(QVector2D p) {
     return section;
 }
 
-Intersection::Intersection(QVector2D p) : pos(p) {}
+Intersection::Intersection(QVector2D p) : pos(p), num(count++){}
+int Intersection::count = 0;
 
 void Intersection::addEdge(Road *edge) {
 	edges << edge;
@@ -159,8 +165,8 @@ Road::Road(Intersection *n1, Intersection *n2) : start(n1), end(n2) {
 
 	QVector2D start = n1->pos;
 	for(int i=0; i < numSections; i++) {
-		QVector2D end = start + unitVec;
-		// For curved roads, vectors will be calculated for each point.
+        QVector2D end = start + unitVec;
+        // For curved roads, vectors will be calculated for each point.
         leftSections[i]  = new Section(this, start, end, leftVec, leftVec);
         rightSections[i] = new Section(this, start, end, rightVec, rightVec);
 		start = end;
@@ -215,7 +221,7 @@ float Road::distance(QVector2D p) {
 }
 
 Section::Section(Road *r, QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2)
-    : road(r), zone(Unzoned), numTentants(0) {
+    : zone(Unzoned), road(r), numTentants(0) {
 	coords[0] = p1 + v1 * .012;
 	coords[1] = p2 + v2 * .012;
 	coords[2] = p2 + v2 * (SECTION_WIDTH * 3 + 0.012);
