@@ -14,7 +14,7 @@ struct Node {
 };
 
 bool operator <(const Node &leftNode, const Node &rightNode) {
-    if(leftNode.dist != rightNode.dist) return leftNode.dist < rightNode.dist;
+    if(leftNode.dist != rightNode.dist) return leftNode.dist > rightNode.dist;
     if(leftNode.n != rightNode.n) return leftNode.n->num < rightNode.n->num;
     return false;
 }
@@ -24,7 +24,10 @@ void Dijkstras::build(Graph *graph) {
     typedef gpriority_queue< gheap<4, 1>, Node> priority_queue;
     int count = Intersection::count;
 
-    table = new float[count * count];
+    table = new float[count * count];   
+    for(int i=0; i < count * count; i++) // Init table to infinity
+        table[i] = INFINITY;
+
     char visited[count];
 
     for(auto start : graph->nodes) {

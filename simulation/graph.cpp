@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "dijkstras.h"
+#include "floydwarshall.h"
 #include <math.h>
 
 #define SECTION_WIDTH 0.030
@@ -28,8 +29,14 @@ void Graph::addEdge(Intersection *n1, Intersection *n2) {
 	splitEdges(edge);
 
     Dijkstras gen(this);
+    FloydWarshall check(this);
     if(pathTable) delete pathTable;
     pathTable = gen.table;
+    float *checkTable = check.table;
+
+    for(int i=0; i < Intersection::count*Intersection::count; i++)
+        if(fabsf(pathTable[i] - checkTable[i]) > 0.00001)
+            qDebug("[%d,%d] : d = %f, f = %f", i / Intersection::count, i % Intersection::count, pathTable[i], checkTable[i]);
 
 	emit changed();
 }

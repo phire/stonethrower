@@ -13,6 +13,8 @@ public:
     Dijkstras(Graph *);
 
     float *table;
+
+private:
     void build(Graph *graph);
 };
 
