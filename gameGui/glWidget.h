@@ -34,6 +34,9 @@ private:
   void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
 
   void HandleLeftClick(int mouseX, int mouseY);
+  void DrawHUD();
+
+  QList<GLuint> hudIcons;
   QMatrix4x4 projectionMatrix;
   QList<Road*> roads;
 

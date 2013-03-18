@@ -39,6 +39,9 @@ void GlWidget::initializeGL() {
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_LINE_SMOOTH);
 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable( GL_BLEND );
+
   qglClearColor(QColor(Qt::black));
   lightingShaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/lightingVertexShader.vsh");
   lightingShaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/lightingFragmentShader.fsh");
@@ -67,6 +70,11 @@ void GlWidget::initializeGL() {
                     << QVector3D(0.2, 0.2, 0.2) << QVector3D(0.2, 0.2, 0.2) << QVector3D(0.2, 0.2, 0.2) // Right
                     << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) // Bottom
                     << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1) << QVector3D(  1,   1,   1);
+
+  hudIcons << bindTexture(QPixmap(":/resources/hud_road.png"))
+           << bindTexture(QPixmap(":/resources/hud_residential.png"))
+           << bindTexture(QPixmap(":/resources/hud_commercial.png"))
+           << bindTexture(QPixmap(":/resources/hud_industrial.png"));
 
   teapot = new Model(&lightingShaderProgram, 0, Qt::gray, ":/resources/teapot.obj");
 }
@@ -169,6 +177,8 @@ void GlWidget::paintGL() {
   colouringShaderProgram.disableAttributeArray("vertex");
   colouringShaderProgram.disableAttributeArray("color");
   colouringShaderProgram.release();
+
+  DrawHUD();
 }
 
 void GlWidget::mousePressEvent(QMouseEvent *event) {
@@ -247,6 +257,56 @@ void GlWidget::updatePan() {
     moveUp   += (cos(angleInRads) * 0.05);
     moveLeft += (sin(angleInRads) * 0.05);
     updateGL();
+}
+
+void GlWidget::DrawHUD() {
+    // Based on code from http://stackoverflow.com/questions/5467218/opengl-2d-hud-over-3d
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0.0, width(), height(), 0.0, -1.0, 10.0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();     //   ----Not sure if I need this
+    glLoadIdentity();
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_CULL_FACE);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    float x = 0;
+    for(int i = 0; i < hudIcons.count(); i++) {
+        glBindTexture(GL_TEXTURE_2D, hudIcons[i]);
+        glBegin(GL_QUADS);
+            glTexCoord2d(0.0,1.0); glVertex2f(x, height() - 50);
+            glTexCoord2d(1.0,1.0); glVertex2f(x + 50, height() - 50);
+            glTexCoord2d(1.0,0.0); glVertex2f(x + 50, height());
+            glTexCoord2d(0.0,0.0); glVertex2f(x, height());
+            x += 51;
+        glEnd();
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glBegin(GL_QUADS);
+    //    glColor4f(0f, 0f, 0f, 0.2f);
+        glVertex2f(0.0, height() - 51);
+        glVertex2f(width(), height() - 51);
+        glVertex2f(width(), height() - 50);
+        glVertex2f(0.0, height() - 50);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    //    glColor4f(1.0f, 1.0f, 1.0, 0.5f);
+        glVertex2f(0.0, height() - 50);
+        glVertex2f(width(), height() - 50);
+        glVertex2f(width(), height());
+        glVertex2f(0.0, height());
+    glEnd();
+
+    // Making sure we can render 3d again
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();//        ----and this?
 }
 
 void GlWidget::HandleLeftClick(int mouseX, int mouseY) {

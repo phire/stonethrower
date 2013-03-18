@@ -8,5 +8,9 @@
         <file>singleColourVertexShader.vsh</file>
         <file>resources/onestreet.st</file>
         <file>resources/teapot.obj</file>
+        <file>resources/hud_road.png</file>
+        <file>resources/hud_residential.png</file>
+        <file>resources/hud_commercial.png</file>
+        <file>resources/hud_industrial.png</file>
     </qresource>
 </RCC>
