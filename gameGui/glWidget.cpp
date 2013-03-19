@@ -184,8 +184,11 @@ void GlWidget::paintGL() {
 void GlWidget::mousePressEvent(QMouseEvent *event) {
   lastMousePosition = event->pos();
 
-  if(event->buttons() & Qt::LeftButton)
+  if(event->buttons() & Qt::LeftButton) {
+    if(event->y() < height() - 52) {
       HandleLeftClick(event->x(), event->y());
+    }
+  }
 
   event->accept();
 }
@@ -206,16 +209,16 @@ void GlWidget::mouseMoveEvent(QMouseEvent *event) {
     if(beta < -90)
       beta = -90;
 
-    if(beta > 90)
-      beta = 90;
+    if(beta > -10)
+      beta = -10;
 
     updateGL();
   }
 
-  panUp    = (event->y() < 20);
-  panDown  = (event->y() > (height() - 20));
-  panLeft  = (event->x() < 20);
-  panRight = (event->x() > (width() - 20));
+  panUp    = (event->y() < 50);
+  panDown  = (event->y() > (height() - 102) && !(event->y() > height() - 52));
+  panLeft  = (event->x() < 50);
+  panRight = (event->x() > (width() - 50));
 
   bool shouldPan = (panLeft || panRight || panUp || panDown);
 
