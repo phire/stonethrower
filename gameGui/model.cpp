@@ -53,7 +53,7 @@ void Model::LoadObj(QString modelPath) {
     QVector<QVector3D> coords, normalCoords;
 
     // do a pre-parse to find a number to scale by and how much to move up on the y axis
-    double largestX, largestY, largestZ, lowestY;
+    double largestX = 0, largestY = 0, largestZ = 0, lowestY = 0;
     while(!modelFile.atEnd()) {
         QString line = QString(modelFile.readLine());
         QStringList lineComponents = line.split(" ", QString::SkipEmptyParts);

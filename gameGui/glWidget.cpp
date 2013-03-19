@@ -281,13 +281,13 @@ void GlWidget::DrawHUD() {
             glTexCoord2d(1.0,1.0); glVertex2f(x + 50, height() - 50);
             glTexCoord2d(1.0,0.0); glVertex2f(x + 50, height());
             glTexCoord2d(0.0,0.0); glVertex2f(x, height());
-            x += 51;
+            x += 50;
         glEnd();
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glBegin(GL_QUADS);
-    //    glColor4f(0f, 0f, 0f, 0.2f);
+        glColor4f(1.0f, 1.0f, 1.0f, 0.9f);
         glVertex2f(0.0, height() - 51);
         glVertex2f(width(), height() - 51);
         glVertex2f(width(), height() - 50);
@@ -295,11 +295,27 @@ void GlWidget::DrawHUD() {
     glEnd();
 
     glBegin(GL_QUADS);
-    //    glColor4f(1.0f, 1.0f, 1.0, 0.5f);
-        glVertex2f(0.0, height() - 50);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.1f);
+        glVertex2f(0.0, height() - 52);
+        glVertex2f(width(), height() - 52);
+        glVertex2f(width(), height() - 51);
+        glVertex2f(0.0, height() - 51);
+    glEnd();
+
+    glBegin(GL_QUADS);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.03f);
+        glVertex2f(x, height() - 53);
+        glVertex2f(width(), height() - 53);
+        glVertex2f(width(), height() - 52);
+        glVertex2f(x, height() - 52);
+    glEnd();
+
+    glBegin(GL_QUADS);
+        glColor4f(1.0f, 1.0f, 1.0, 0.8f);
+        glVertex2f(x, height() - 50);
         glVertex2f(width(), height() - 50);
         glVertex2f(width(), height());
-        glVertex2f(0.0, height());
+        glVertex2f(x, height());
     glEnd();
 
     // Making sure we can render 3d again
