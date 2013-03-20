@@ -74,7 +74,14 @@ void GlWidget::initializeGL() {
   hudIcons << bindTexture(QPixmap(":/resources/hud_road.png"))
            << bindTexture(QPixmap(":/resources/hud_residential.png"))
            << bindTexture(QPixmap(":/resources/hud_commercial.png"))
-           << bindTexture(QPixmap(":/resources/hud_industrial.png"));
+           << bindTexture(QPixmap(":/resources/hud_industrial.png"))
+           << bindTexture(QPixmap(":/resources/hud_nuclear.png"))
+           << bindTexture(QPixmap(":/resources/hud_coal.png"))
+           << bindTexture(QPixmap(":/resources/hud_police.png"))
+           << bindTexture(QPixmap(":/resources/hud_fire.png"))
+           << bindTexture(QPixmap(":/resources/hud_stadium.png"))
+           << bindTexture(QPixmap(":/resources/hud_park.png"))
+           ;
 
   teapot = new Model(&lightingShaderProgram, 0, Qt::gray, ":/resources/teapot.obj");
 }

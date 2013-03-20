@@ -12,5 +12,11 @@
         <file>resources/hud_residential.png</file>
         <file>resources/hud_commercial.png</file>
         <file>resources/hud_industrial.png</file>
+        <file>resources/hud_coal.png</file>
+        <file>resources/hud_fire.png</file>
+        <file>resources/hud_nuclear.png</file>
+        <file>resources/hud_park.png</file>
+        <file>resources/hud_police.png</file>
+        <file>resources/hud_stadium.png</file>
     </qresource>
 </RCC>
