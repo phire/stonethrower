@@ -83,7 +83,7 @@ void GlWidget::initializeGL() {
            << bindTexture(QPixmap(":/resources/hud_park.png"))
            ;
 
-  teapot = new Model(&lightingShaderProgram, 0, Qt::gray, ":/resources/teapot.obj");
+
 }
 
 void GlWidget::resizeGL(int width, int height) {
@@ -154,16 +154,18 @@ void GlWidget::paintGL() {
       currentMatrix.translate(1, 0, 0);
   }
 
-  foreach(QVector3D location, buildings) {
-      Building* building = buildingFactory.GetBuilding(1, 1);
+  for(int i = 0; i < buildingLocations.size(); i++) {
+      Building* building = buildingFactory.GetBuilding(buildingTypes[i], 0);
 
       if(building == NULL)
           continue;
 
       QMatrix4x4 loc = mvMatrix;
+      QVector3D location = buildingLocations[i];
       loc.translate(location.x(), 0, location.z());
 
-      teapot->Draw(viewMatrix, loc, lightPosition, projectionMatrix);
+      Model m(&lightingShaderProgram, building->GetHeight(), building->GetColour());
+      m.Draw(viewMatrix, loc, lightPosition, projectionMatrix);
   }
 
   mMatrix.setToIdentity();
@@ -195,7 +197,13 @@ void GlWidget::mousePressEvent(QMouseEvent *event) {
     if(event->y() < height() - 52) {
       HandleLeftClick(event->x(), event->y());
     }
+    else {
+      placeType = event->x() / 50;
+    }
   }
+
+  if(event->buttons() & Qt::RightButton)
+      placeType = 0;
 
   event->accept();
 }
@@ -363,6 +371,7 @@ void GlWidget::HandleLeftClick(int mouseX, int mouseY) {
     double x = ((-1.0*x2*y1)/y2)+x1;
     double z = ((-1.0*z2*y1)/y2)+z1;
 
-    buildings.push_back(QVector3D(x, 0, z));
+    buildingLocations.push_back(QVector3D(x, 0, z));
+    buildingTypes.push_back(placeType);
     updateGL();
 }

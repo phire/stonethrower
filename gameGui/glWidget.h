@@ -54,8 +54,9 @@ private:
   QTimer* panTimer;
   QMatrix4x4 mvMatrix;
 
-  QList<QVector3D> buildings;
-  Model* teapot;
+  QList<QVector3D> buildingLocations;
+  QList<int> buildingTypes;
+  int placeType;
 
 private slots:
   void updatePan();

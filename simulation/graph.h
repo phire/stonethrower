@@ -66,7 +66,7 @@ public:
 
 class Section {
 public:
-	enum zone {Unzoned, Residential, Commercial, Industrial};
+    enum zone {Unzoned, Residential, Commercial, Industrial, Nuclear, Coal, Police, Fire, Stadium, Park};
     Section(): zone(Unzoned) {}
     Section(Road*, QVector2D, QVector2D, QVector2D, QVector2D);
 
