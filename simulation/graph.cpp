@@ -29,15 +29,18 @@ void Graph::addEdge(Intersection *n1, Intersection *n2) {
 	splitEdges(edge);
 
     FloydWarshall gen(this);
-    Dijkstras check(this);
     delete pathTable; // Note: put a lock around this
     pathTable = gen.table;
+
+#if 0
+    Dijkstras check(this);
     float *checkTable = check.table;
 
     for(int i=0; i < Intersection::count; i++)
         for(int j=0; j < Intersection::count; j++)
             if(fabsf(checkTable[i*Intersection::count + j] - pathTable[i*gen.width+j]) > 0.00001)
                 qDebug("[%i,%i] d: %f f: %f", i, j, checkTable[i*Intersection::count + j], pathTable[i*gen.width+j]);
+#endif
 
 	emit changed();
 }
@@ -135,6 +138,7 @@ Section *Graph::sectionAt(QVector2D p) {
 }
 
 Intersection::Intersection(QVector2D p) : pos(p), num(count++){}
+Intersection::Intersection(int num, QVector2D p) : pos(p), num(num){}
 int Intersection::count = 0;
 
 void Intersection::addEdge(Road *edge) {
@@ -178,7 +182,39 @@ Road::Road(Intersection *n1, Intersection *n2) : start(n1), end(n2) {
         leftSections[i]  = new Section(this, start, end, leftVec, leftVec);
         rightSections[i] = new Section(this, start, end, rightVec, rightVec);
 		start = end;
-	}
+    }
+}
+
+Road::Road(int s, int e, QVector<Section *> left, QVector<Section *> right) {
+    // We just need somewhere to store these indexes temporally until fixup() is run;
+    start = (Intersection *)(size_t) s;
+    end = (Intersection *)(size_t) e;
+
+    leftSections = left;
+    rightSections = right;
+
+    for(Section *s : leftSections)
+        s->road = this;
+    for(Section *s : rightSections)
+        s->road = this;
+}
+
+void Road::fixup(QSet<Intersection*> nodes) {
+    for(Intersection *i : nodes)
+        if(i->num == (int)(size_t)start) {
+            start = i;
+            break;
+        }
+    for(Intersection *i : nodes)
+        if(i->num == (int)(size_t)end) {
+            end = i;
+            break;
+        }
+
+    QVector2D vec = (end->pos - start->pos);
+    length = vec.length();
+    start->addEdge(this);
+    end->addEdge(this);
 }
 
 std::array<QVector2D*, 2> Road::getCoords() const {
@@ -236,6 +272,9 @@ Section::Section(Road *r, QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2
 	coords[3] = p1 + v1 * (SECTION_WIDTH * 3 + 0.012);
 }
 
+Section::Section(int zone, int numTentants, QVector2D a, QVector2D b, QVector2D c, QVector2D d) :
+    zone(zone), numTentants(numTentants), coords({a, b, c, d}) {}
+
 /* Based on Paul Bourkes "Determining if a point lines on the interior of a
  * polygon" at http://paulbourke.net/geometry/polygonmesh/ (Soultion 3)
  *
@@ -259,4 +298,107 @@ bool Section::containsPoint(QVector2D point) const {
 			return false; // then the point is not inside the polygon
 	}
 	return true;
+}
+
+/****************
+* Serialization *
+****************/
+
+QDataStream &operator <<(QDataStream &s, const Graph &g) {
+    s << g.nodes.size();
+    for(Intersection *intersection : g.nodes)
+        s << *intersection;
+    s << g.edges.size();
+    for(Road *road: g.edges)
+        s << *road;
+    return s;
+}
+
+QDataStream &operator >>(QDataStream &s, Graph &g) {
+    int size;
+    s >> size;
+    for(int i=0; i<size; i++) {
+        Intersection *intersection;
+        s >> intersection;
+        g.nodes.insert(intersection);
+        Intersection::count = std::max(Intersection::count, intersection->num + 1);
+    }
+
+    s >> size;
+    for(int i=0; i<size; i++) {
+        Road *road;
+        s >> road;
+        road->fixup(g.nodes);
+        g.edges.append(road);
+    }
+    return s;
+}
+
+QDataStream &operator <<(QDataStream &s, const Intersection &intersection) {
+    s << intersection.num;
+    s << intersection.pos;
+    return s;
+}
+
+QDataStream &operator >>(QDataStream &s, Intersection *&intersection) {
+    int num;
+    QVector2D pos;
+    s >> num;
+    s >> pos;
+    intersection = new Intersection(num, pos);
+    return s;
+}
+
+QDataStream &operator <<(QDataStream &s, const Road &road) {
+    s << road.start->num;
+    s << road.end->num;
+    s << road.leftSections.size();
+    for(Section *section : road.leftSections)
+        s << *section;
+    s << road.rightSections.size();
+    for(Section *section : road.rightSections)
+        s << *section;
+    return s;
+}
+
+
+QDataStream &operator >>(QDataStream &s, Road *&road) {
+    int start, end, size;
+    QVector<Section*> leftSections;
+    QVector<Section*> rightSections;
+
+    s >> start;
+    s >> end;
+    s >> size;
+    for(int i=0; i<size; i++) {
+        Section *section;
+        s >> section;
+        leftSections.append(section);
+    }
+    s >> size;
+    for(int i=0; i<size; i++) {
+        Section *section;
+        s >> section;
+        rightSections.append(section);
+    }
+
+    road = new Road(start, end, leftSections, rightSections);
+    return s;
+}
+
+QDataStream &operator <<(QDataStream &s, const Section &section) {
+    s << section.zone;
+    s << section.numTentants;
+    s << section.coords[0] << section.coords[1] << section.coords[2] << section.coords[3];
+    return s;
+}
+
+QDataStream &operator >>(QDataStream &s, Section *&section) {
+    int zone, numTentants;
+    QVector2D a, b, c, d;
+    s >> zone;
+    s >> numTentants;
+    s >> a >> b >> c >> d;
+    section = new Section(zone, numTentants, a, b, c, d);
+    return s;
 }

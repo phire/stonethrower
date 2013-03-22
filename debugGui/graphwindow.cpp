@@ -10,6 +10,14 @@ GraphWindow::GraphWindow(QWindow *parent)
 	scale = 1000;
     mode = 1;
 
+    QFile file("save.sto");
+    if(file.exists()) {
+        file.open(QIODevice::ReadOnly);
+        QByteArray ba = qUncompress(file.readAll());
+        QDataStream in(ba);
+        in >> graph;
+    }
+
 	QObject::connect(&graph, SIGNAL(changed()), this, SLOT(renderLater()));
 }
 
@@ -192,6 +200,16 @@ void GraphWindow::keyReleaseEvent(QKeyEvent *e) {
         break;
     case Qt::Key_5:
         mode = 5;
+        break;
+    case Qt::Key_S:
+        qDebug("Saving");
+        QFile file("save.sto");
+        file.open(QIODevice::WriteOnly);
+        QBuffer buffer;
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream out(&buffer);
+        out << graph;
+        file.write(qCompress(buffer.buffer()));
         break;
     }
 }
