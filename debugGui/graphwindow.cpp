@@ -1,4 +1,5 @@
 #include "graphwindow.h"
+#include "floydwarshall.h"
 
 GraphWindow::GraphWindow(QWindow *parent)
   : QWindow(parent), m_update_pending(false), showGuide(false) {
@@ -201,7 +202,7 @@ void GraphWindow::keyReleaseEvent(QKeyEvent *e) {
     case Qt::Key_5:
         mode = 5;
         break;
-    case Qt::Key_S:
+    case Qt::Key_S: {
         qDebug("Saving");
         QFile file("save.sto");
         file.open(QIODevice::WriteOnly);
@@ -211,5 +212,24 @@ void GraphWindow::keyReleaseEvent(QKeyEvent *e) {
         out << graph;
         file.write(qCompress(buffer.buffer()));
         break;
+    }
+    case Qt::Key_B: {
+        QTime q;
+        q.start();
+        FloydWarshall t1(&graph);
+        FloydWarshall t2(&graph);
+        FloydWarshall t3(&graph);
+        FloydWarshall t4(&graph);
+        FloydWarshall t5(&graph);
+        FloydWarshall t6(&graph);
+        FloydWarshall t7(&graph);
+        FloydWarshall t8(&graph);
+        FloydWarshall t9(&graph);
+        FloydWarshall t0(&graph);
+        qDebug("Benchmarked FloydWarshall @ %d ms", q.elapsed());
+        free(t1.table); free(t2.table); free(t3.table); free(t4.table); free(t5.table);
+        free(t6.table); free(t7.table); free(t8.table); free(t9.table); free(t0.table);
+        break;
+    }
     }
 }

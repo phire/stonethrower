@@ -30,7 +30,7 @@ public:
 	QSet<Intersection*> nodes;
 	QList<Road*> edges;
 
-    float *pathTable = new float[0];
+    float *pathTable = NULL;
 };
 
 QDataStream &operator<<(QDataStream &, const Graph &);

@@ -29,7 +29,7 @@ void Graph::addEdge(Intersection *n1, Intersection *n2) {
 	splitEdges(edge);
 
     FloydWarshall gen(this);
-    delete pathTable; // Note: put a lock around this
+    free(pathTable); // Note: put a lock around this
     pathTable = gen.table;
 
 #if 0
