@@ -2,7 +2,9 @@
 #include <math.h>
 #define SSE
 #include <xmmintrin.h>
-#include <malloc.h>
+#ifndef __APPLE__
+    #include <malloc.h>
+#endif
 
 FloydWarshall::FloydWarshall(Graph *graph) : height(Intersection::count),
 #ifdef SSE // Make sure the table is a multiple of 4 wide, Any extra
@@ -12,7 +14,11 @@ FloydWarshall::FloydWarshall(Graph *graph) : height(Intersection::count),
 #endif
 
     // Allocate the table outside of the thread, so we can always assume it exsists when we terminate the thread
+#ifndef __APPLE__
     table = (float *) memalign(16, sizeof(float) * width * height); // aligning it gives us a 40% speed boost
+#else
+    table = (float *) malloc(sizeof(float) * width * height);
+#endif
 
     build(graph);
 }
