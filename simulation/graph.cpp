@@ -273,7 +273,12 @@ Section::Section(Road *r, QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2
 }
 
 Section::Section(int zone, int numTentants, QVector2D a, QVector2D b, QVector2D c, QVector2D d) :
-    zone(zone), numTentants(numTentants), coords({a, b, c, d}) {}
+    zone(zone), numTentants(numTentants) {
+    coords[0] = a;
+    coords[1] = b;
+    coords[2] = c;
+    coords[3] = d;
+}
 
 /* Based on Paul Bourkes "Determining if a point lines on the interior of a
  * polygon" at http://paulbourke.net/geometry/polygonmesh/ (Soultion 3)
