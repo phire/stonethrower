@@ -226,7 +226,7 @@ void GraphWindow::keyReleaseEvent(QKeyEvent *e) {
         FloydWarshall t8(&graph);
         FloydWarshall t9(&graph);
         FloydWarshall t0(&graph);
-        qDebug("Benchmarked FloydWarshall @ %d ms", q.elapsed());
+        qDebug("Benchmarked FloydWarshall @ %d ms - %d nodes, %d edges", q.elapsed(), graph.nodes.size(), graph.edges.size());
         free(t1.table); free(t2.table); free(t3.table); free(t4.table); free(t5.table);
         free(t6.table); free(t7.table); free(t8.table); free(t9.table); free(t0.table);
         break;

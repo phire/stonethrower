@@ -1,24 +1,18 @@
 #include "floydwarshall.h"
 #include <math.h>
-#define SSE
 #include <xmmintrin.h>
-#ifndef __APPLE__
-    #include <malloc.h>
-#endif
+
+#define SSE
 
 FloydWarshall::FloydWarshall(Graph *graph) : height(Intersection::count),
-#ifdef SSE // Make sure the table is a multiple of 4 wide, Any extra
+#ifdef SSE // padd the table width to a multiple of 4
     width((height & 3) == 0 ? height : height + (4 - (height & 3))) {
 #else
     width(height) {
 #endif
 
     // Allocate the table outside of the thread, so we can always assume it exsists when we terminate the thread
-#ifndef __APPLE__
-    table = (float *) memalign(16, sizeof(float) * width * height); // aligning it gives us a 40% speed boost
-#else
-    table = (float *) malloc(sizeof(float) * width * height);
-#endif
+    table = (float *) _mm_malloc(16, sizeof(float) * width * height); // aligning it gives us a 40% speed boost
 
     build(graph);
 }
@@ -39,7 +33,7 @@ void FloydWarshall::build(Graph *graph) {
         table[r->end->num * width + r->start->num] = r->length; // our roads are (currently) bidirectional
     }
 
-#ifdef SSE
+#ifdef SSE // This is now memory bound, can't be optimised any futher.
     for(unsigned int k=0; k < height; k++) {
         float *kcol = table + k * width; // stop GCC from being stupid and recalculating these in the inner loop
         for(unsigned int i=0; i < height; i++) {
@@ -53,6 +47,7 @@ void FloydWarshall::build(Graph *graph) {
             }
         }
     }
+
 #else
     for(int k=0; k < width; k++)
         for(int i=0; i < width; i++)
