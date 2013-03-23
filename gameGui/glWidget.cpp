@@ -168,6 +168,15 @@ void GlWidget::paintGL() {
       m.Draw(viewMatrix, loc, lightPosition, projectionMatrix);
   }
 
+  Building* buildingUnderCursor = buildingFactory.GetBuilding(placeType, 0);
+  if(!mousePos.isNull() && buildingUnderCursor != NULL) {
+    QMatrix4x4 loc = mvMatrix;
+    loc.translate(mousePos.x(), 0, mousePos.y());
+
+    Model m(&lightingShaderProgram, buildingUnderCursor->GetHeight(), buildingUnderCursor->GetColour());
+    m.Draw(viewMatrix, loc, lightPosition, projectionMatrix);
+  }
+
   mMatrix.setToIdentity();
   mMatrix.translate(lightPosition);
   mMatrix.rotate(0.0, 0, 1, 0);
@@ -229,6 +238,15 @@ void GlWidget::mouseMoveEvent(QMouseEvent *event) {
 
     updateGL();
   }
+
+  if(event->y() < (height() - 53)) {
+    mousePos = GetMouseCoords(event->x(), event->y());
+  }
+  else {
+    mousePos = QVector2D();
+  }
+
+  updateGL();
 
   panUp    = (event->y() < 50);
   panDown  = (event->y() > (height() - 102) && !(event->y() > height() - 52));
@@ -343,35 +361,41 @@ void GlWidget::DrawHUD() {
     glPopMatrix();//        ----and this?
 }
 
+QVector2D GlWidget::GetMouseCoords(int mouseX, int mouseY) {
+  // OpenGL coords start from the bottom right
+  mouseY = height() - mouseY;
+
+  GLdouble modelViewMatrix[16];
+  GLdouble projectionMatrix[16];
+  int viewport[4];
+
+  for(int i = 0; i < 16; i++) {
+      projectionMatrix[i] = this->projectionMatrix.data()[i];
+      modelViewMatrix[i]  = this->mvMatrix.data()[i];
+  }
+
+  glGetIntegerv(GL_VIEWPORT, viewport);
+
+  GLdouble x1, y1, z1;
+  gluUnProject(mouseX, mouseY, 0.0, modelViewMatrix, projectionMatrix,
+      viewport, &x1, &y1, &z1);
+
+  GLdouble x2, y2, z2;
+  gluUnProject(mouseX, mouseY, 1.0, modelViewMatrix, projectionMatrix,
+      viewport, &x2, &y2, &z2);
+
+  // assume they've clicked on the land, where y = 0 and solve for x and z
+  // uses the formula from http://www.netcomuk.co.uk/~jenolive/vect17.html
+  double x = ((-1.0*x2*y1)/y2)+x1;
+  double z = ((-1.0*z2*y1)/y2)+z1;
+
+  return QVector2D(x, z);
+}
+
 void GlWidget::HandleLeftClick(int mouseX, int mouseY) {
-    // OpenGL coords start from the bottom right
-    mouseY = height() - mouseY;
+    QVector2D mousePos = GetMouseCoords(mouseX, mouseY);
 
-    GLdouble modelViewMatrix[16];
-    GLdouble projectionMatrix[16];
-    int viewport[4];
-
-    for(int i = 0; i < 16; i++) {
-        projectionMatrix[i] = this->projectionMatrix.data()[i];
-        modelViewMatrix[i]  = this->mvMatrix.data()[i];
-    }
-
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    GLdouble x1, y1, z1;
-    gluUnProject(mouseX, mouseY, 0.0, modelViewMatrix, projectionMatrix,
-        viewport, &x1, &y1, &z1);
-
-    GLdouble x2, y2, z2;
-    gluUnProject(mouseX, mouseY, 1.0, modelViewMatrix, projectionMatrix,
-        viewport, &x2, &y2, &z2);
-
-    // assume they've clicked on the land, where y = 0 and solve for x and z
-    // uses the formula from http://www.netcomuk.co.uk/~jenolive/vect17.html
-    double x = ((-1.0*x2*y1)/y2)+x1;
-    double z = ((-1.0*z2*y1)/y2)+z1;
-
-    buildingLocations.push_back(QVector3D(x, 0, z));
+    buildingLocations.push_back(QVector3D(mousePos.x(), 0, mousePos.y()));
     buildingTypes.push_back(placeType);
     updateGL();
 }

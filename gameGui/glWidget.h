@@ -32,6 +32,7 @@ private:
 
   void drawLand(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix);
   void drawModel(QMatrix4x4 viewMatrix, QMatrix4x4 mvMatrix, QVector3D lightPosition);
+  QVector2D GetMouseCoords(int mouseX, int mouseY);
 
   void HandleLeftClick(int mouseX, int mouseY);
   void DrawHUD();
@@ -57,6 +58,7 @@ private:
   QList<QVector3D> buildingLocations;
   QList<int> buildingTypes;
   int placeType;
+  QVector2D mousePos;
 
 private slots:
   void updatePan();
