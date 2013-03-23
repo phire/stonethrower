@@ -265,7 +265,7 @@ float Road::distance(QVector2D p) {
 }
 
 Section::Section(Road *r, QVector2D p1, QVector2D p2, QVector2D v1, QVector2D v2)
-    : zone(Unzoned), road(r), numTentants(0) {
+    : zone(Unzoned), numTentants(0), road(r) {
 	coords[0] = p1 + v1 * .012;
 	coords[1] = p2 + v2 * .012;
 	coords[2] = p2 + v2 * (SECTION_WIDTH * 3 + 0.012);
