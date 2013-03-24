@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QtGui>
+#include <QtCore>
 #include <array>
+#include <QVector2D>
 
 class Road;
 class Intersection;

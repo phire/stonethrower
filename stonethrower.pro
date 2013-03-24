@@ -5,7 +5,8 @@ QMAKE_CXXFLAGS += -std=c++11
 
 SUBDIRS = simulation \
       debugGui \
-    gameGui
+    gameGui \
+    benchmark
 
 debugGui.depends = simulation
 gameGui.depends  = simulation

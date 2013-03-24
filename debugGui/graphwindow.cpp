@@ -1,5 +1,6 @@
 #include "graphwindow.h"
 #include "floydwarshall.h"
+#include "xmmintrin.h"
 
 GraphWindow::GraphWindow(QWindow *parent)
   : QWindow(parent), m_update_pending(false), showGuide(false) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Qt>
+#include <QColor>
 #include "graph.h"
 
 class Building {
