@@ -12,7 +12,7 @@ FloydWarshall::FloydWarshall(Graph *graph) : height(Intersection::count),
 #endif
 
     // Allocate the table outside of the thread, so we can always assume it exsists when we terminate the thread
-    table = (float *) _mm_malloc(16, sizeof(float) * width * height); // aligning it gives us a 40% speed boost
+    table = (float *) _mm_malloc(sizeof(float) * width * height, 16); // aligning it gives us a 40% speed boost
 
     build(graph);
 }
