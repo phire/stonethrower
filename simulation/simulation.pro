@@ -1,5 +1,6 @@
 TARGET = simulation
 
+DESTDIR = ./
 TEMPLATE = lib
 CONFIG += staticlib
 DEFINES = SIMULATION_LIBRARY
