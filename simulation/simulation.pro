@@ -1,6 +1,9 @@
 TARGET = simulation
 
-DESTDIR = ./
+win32 {
+    DESTDIR = ./
+}
+
 TEMPLATE = lib
 CONFIG += staticlib
 DEFINES = SIMULATION_LIBRARY
