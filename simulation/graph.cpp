@@ -102,7 +102,7 @@ Intersection* Graph::nodeAt(QVector2D v) {
 
 Road* Graph::roadAt(QVector2D p) {
     float minDist = 1000000000000.0; // big number
-    Road *closestRoad;
+    Road *closestRoad = NULL;
     for(Road *road : edges) {
         float dist = road->distance(p);
         if(dist < minDist) {
